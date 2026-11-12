@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "douyin-analysis"
+version = "0.1.0"
+description = "Reproducible e-commerce behavior analysis"
+requires-python = ">=3.10"
+dependencies = ["pandas>=2.2", "pyarrow>=15", "duckdb>=1.1", "matplotlib>=3.8", "scikit-learn>=1.4"]
+
+[project.optional-dependencies]
+dev = ["black", "isort", "flake8", "mypy", "pylint", "pytest", "pandas-stubs"]
+reports = ["reportlab>=4"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.10"
+check_untyped_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.pylint.main]
+persistent = false
+disable = ["too-few-public-methods", "too-many-locals", "line-too-long", "import-error"]
