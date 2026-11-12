@@ -79,4 +79,4 @@ PDF 可通过安装 `.[reports]` 后执行 `python scripts/build_weekly_pdf.py` 
 
 ## 仓库管理
 
-`main` 保存可审阅版本，`dev` 汇总开发，`feature/*` 做单项任务。提交遵循 Conventional Commits。原始资料、数据库、用户级中间表、环境及凭证不提交。GitHub 链接与助教发送状态在提供账号/接收渠道后补齐；本地仓库不等于已发布。
+`main` 保存可审阅版本，`dev` 汇总开发，`feature/*` 做单项任务。提交遵循 Conventional Commits。原始资料、数据库、用户级中间表、环境及凭证不提交。仓库和首周标签已发布；助教的访问账号、接收渠道和发送仍待确认。

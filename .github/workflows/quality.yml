@@ -1,5 +1,7 @@
 name: quality
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -9,9 +11,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -e '.[dev]'
-      - run: black --check src tests
-      - run: isort --check-only src tests
-      - run: flake8 src tests
+      - run: black --check src tests scripts
+      - run: isort --check-only src tests scripts
+      - run: flake8 src tests scripts
       - run: mypy src
       - run: pylint src
       - run: python scripts/check_project_rules.py
