@@ -1,0 +1,8 @@
+{
+  "independent_raw_count": true,
+  "row_conservation": true,
+  "parquet_count": true,
+  "sqlite_behavior_aggregation": true,
+  "foreign_keys": true,
+  "normalized_item_category": true
+}

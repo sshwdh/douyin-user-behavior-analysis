@@ -1,0 +1,2 @@
+Imported rows: 6213379
+Foreign key violations: 0

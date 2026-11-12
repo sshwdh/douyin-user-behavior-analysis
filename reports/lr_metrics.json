@@ -1,0 +1,54 @@
+{
+  "task": "historically interacted user-item pairs; next 7 days purchase",
+  "cutoffs": [
+    "2025-11-25",
+    "2025-12-02",
+    "2025-12-09"
+  ],
+  "train_rows": 1030893,
+  "train_positive_rate": 0.0026530396462096455,
+  "candidate_coverage": [
+    {
+      "cutoff": "2025-11-25T00:00:00",
+      "future_purchased_pairs": 21556,
+      "covered_purchased_pairs": 2735,
+      "coverage": 0.12687882724067545
+    },
+    {
+      "cutoff": "2025-12-02T00:00:00",
+      "future_purchased_pairs": 21268,
+      "covered_purchased_pairs": 2525,
+      "coverage": 0.11872296407748731
+    },
+    {
+      "cutoff": "2025-12-09T00:00:00",
+      "future_purchased_pairs": 31583,
+      "covered_purchased_pairs": 5175,
+      "coverage": 0.1638539720735839
+    }
+  ],
+  "validation": {
+    "rows": 1061515,
+    "positives": 2525,
+    "positive_rate": 0.002378675760587462,
+    "roc_auc": 0.867912202912564,
+    "pr_auc_average_precision": 0.024398341532341286,
+    "accuracy": 0.9851476427558725,
+    "precision": 0.03854464347947306,
+    "recall": 0.219009900990099,
+    "f1": 0.06555239449976293,
+    "threshold": 0.9398463570336814
+  },
+  "test": {
+    "rows": 1117324,
+    "positives": 5175,
+    "positive_rate": 0.0046316019346223656,
+    "roc_auc": 0.8603199394923463,
+    "pr_auc_average_precision": 0.0448043164047274,
+    "accuracy": 0.9846919962338587,
+    "precision": 0.07025001801282513,
+    "recall": 0.18840579710144928,
+    "f1": 0.10234071586018684,
+    "threshold": 0.9398463570336814
+  }
+}
