@@ -1,4 +1,4 @@
-"""将已验证的第一周结果编排为三页中文 PDF。"""
+"""将已验证的第一周结果编排为含八张图表的中文 PDF。"""
 
 import json
 from pathlib import Path
@@ -21,7 +21,7 @@ from reportlab.platypus import (
 
 
 def build(root: Path) -> None:
-    """读取质量报告，生成供本人核对后提交的 PDF。
+    """读取质量报告，生成第一周正式提交 PDF。
 
     Args:
         root: 项目根目录。
@@ -85,10 +85,10 @@ def build(root: Path) -> None:
         story.append(Paragraph(text, styles[style]))
 
     paragraph("第一周项目工作汇报", "TitleCN")
-    paragraph("抖音商城用户行为数据分析 · 提交前核对稿", "SectionCN")
-    paragraph("实习开始：2026-11-06　｜　计划提交：2026-11-13")
+    paragraph("抖音商城用户行为数据分析 · 第一阶段", "SectionCN")
+    paragraph("汇报周期：2026-11-06 至 2026-11-13　｜　提交：2026-11-13")
     paragraph(
-        "本稿记录 11/12 集中推进的实际成果，不倒填此前每日工作。汇报人姓名及个人收获待本人确认。"
+        "本周重点完成工程环境搭建、数据处理与质量核查；11/13 补齐文献调研和清洗口径确认单。"
     )
     paragraph("一、本周已完成", "SectionCN")
     paragraph(
@@ -100,7 +100,7 @@ def build(root: Path) -> None:
             ["质量指标", "实际结果"],
             ["原始记录", f"{quality['raw_rows']:,}"],
             ["清洗后记录", f"{quality['clean_rows']:,}"],
-            ["四元组重复记录", f"{quality['duplicate_rows']:,}（49.31%）"],
+            ["四元组合并记录", f"{quality['duplicate_rows']:,}（49.31%）"],
             ["无效记录 / 多类目商品", "0 / 0"],
             ["用户 / 商品 / 类目", "10,000 / 2,876,947 / 8,916"],
             ["数据观察期", "2025-11-18 至 2025-12-18"],
@@ -130,8 +130,8 @@ def build(root: Path) -> None:
         + "另有 41,221 对首次浏览与最后购买同小时，无法确认顺序。"
     )
     paragraph(
-        "首要待确认问题：49.31% 的记录被小时去重规则折叠。"
-        + "这可能含真实重复浏览，不能全部称为脏数据；已保存逐行为去重敏感性对照。"
+        "首要待确认问题：是否采用小时四元组去重？该规则合并了 49.31% 的记录。"
+        + "其中可能含真实重复交互，不能全部称为脏数据；请同时确认行为码映射、时区及采样完整性。"
     )
     story.append(PageBreak())
     paragraph("方法、验证与下一周安排", "TitleCN")
@@ -148,49 +148,110 @@ def build(root: Path) -> None:
         "代码采用 4 空格、88 字符行宽、类型注解和 Google 文档字符串。"
         + "测试覆盖去重、非法输入、前导零 ID、标签边界和右截尾；实际检查日志随仓库提交。"
     )
-    paragraph("四、难点与能力收获", "SectionCN")
+    paragraph("四、文献调研与方法总结", "SectionCN")
     paragraph(
         "实际只有 1 万用户，与说明中的平台整体规模不同；来源及采样方式待带教确认。"
         + "缺少金额、订单、曝光及内容侧字段，因此不计算虚假 GMV、RFM 金额或跨场景归因。"
     )
     paragraph(
-        "个人收获待本人补充：请结合亲自运行的例子，解释事件与用户指标的区别、"
-        + "全局去重的必要性，以及为什么未来标签不能参与特征计算。"
+        "已整理 Wide & Deep、DIN、BST 三篇文献的方法、实验与适用限制，"
+        + "形成比较笔记。方法总结：先确定样本与指标口径，再比较模型；论文效果不能直接迁移为本项目收益。"
     )
     paragraph("五、下一周安排：11/16 - 11/20", "SectionCN")
     for text in [
-        "周一：补全文献精读，构建用户、商品、交叉窗口特征，核验候选覆盖。",
-        "周二：RF、偏好与序列特征，完善小时并列行为及边界测试。",
-        "周三：稀疏 SVD、共现与特征筛选，严格限制拟合数据范围。",
-        "周四：固定七日标签，完成时间外推 LR 与 7:2:1 分层对照。",
-        "周五：树模型、不平衡处理初步对照，提交第二周汇报与实验表。",
+        "周一：跟进清洗口径与行为码确认，根据反馈固定数据版本及指标定义。",
+        "周二：完善用户、商品与交互统计特征，记录计算窗口及字段说明。",
+        "周三：检查候选覆盖、时间窗口和标签边界，完善特征防泄漏验证。",
+        "周四：复核已完成的初步 LR 基线；视口径确认进度开展树模型对照。",
+        "周五：汇总实际实验与问题，提交第二周报告；按带教反馈调整后续安排。",
     ]:
         paragraph(text)
     paragraph("六、未完成项与附件", "SectionCN")
     paragraph(
         "论文实验复现、完整预测特征、树/深度模型、融合解释性和最终 PPT 尚未完成。"
-        + "不以已编写脚本代替训练证据。GitHub 发布以远端文件为准；助教接收渠道待提供。"
+        + "已提前运行初步 LR，仅作诊断性探索，候选覆盖与预测效果仍需改进。"
     )
     paragraph("仓库：https://github.com/sshwdh/douyin-user-behavior-analysis")
     paragraph(
-        "附件：analysis_report.md、quality.json、结果图片、代码测试及四周执行计划。"
+        "仓库含文献调研、质量报告、清洗口径确认单及代码。仓库已公开，可通过上述链接直接查看。"
     )
-    story.append(PageBreak())
-    paragraph("关键结果图", "TitleCN")
-    paragraph("图 1：每日活跃用户（全部行为用户按日去重）", "SectionCN")
-    story.append(
-        Image(str(root / "reports/figures/02_daily.png"), width=495, height=270)
-    )
-    paragraph(
-        "12 月 12 日出现活跃峰值；是否由活动驱动仍需结合业务信息验证。", "CaptionCN"
-    )
-    story.append(Spacer(1, 12))
-    paragraph("图 2：每日购买用户（行为码为 4 的去重用户）", "SectionCN")
-    story.append(
-        Image(str(root / "reports/figures/03_daily.png"), width=495, height=270)
-    )
-    paragraph("购买用户不等于订单数；完整八类图表及汇总 CSV 见附件目录。", "CaptionCN")
-    document.build(story)
+    charts = [
+        (
+            "行为结构与活跃趋势",
+            "01_behavior.png",
+            "图 1：各类行为事件数",
+            "pv=浏览，fav=收藏，cart=加购，buy=购买。采用小时去重事件数；四类行为不构成严格四步漏斗。",
+        ),
+        (
+            "",
+            "02_daily.png",
+            "图 2：每日活跃用户",
+            "同一天发生任意行为的用户去重计数；12 月 12 日出现峰值，原因仍需业务信息验证。",
+        ),
+        (
+            "购买趋势与小时分布",
+            "03_daily.png",
+            "图 3：每日购买用户",
+            "按日统计行为码为 4 的去重用户；购买用户数不等于订单数，行为映射待带教确认。",
+        ),
+        (
+            "",
+            "04_hourly.png",
+            "图 4：一天内各小时的事件分布",
+            "将观察期全部日期按小时汇总，22 时事件最多；使用原始时间值，业务时区待确认。",
+        ),
+        (
+            "类目偏好与星期分布",
+            "05_categories.png",
+            "图 5：购买用户数前十类目",
+            "按类目内去重购买用户数排序；用户可跨类目出现，不能把柱高相加当作总购买人数。",
+        ),
+        (
+            "",
+            "06_weekday.png",
+            "图 6：不同星期的日均事件数",
+            "1=周一，7=周日；各星期事件总数除以实际天数。仅一个月样本，不足以证明稳定周期规律。",
+        ),
+        (
+            "用户活跃度与购买频次",
+            "07_activity.png",
+            "图 7：用户事件频次分布",
+            "按整个观察期的小时去重事件数分组：1-9、10-49、50-99、100 及以上；分组受去重规则影响。",
+        ),
+        (
+            "",
+            "08_repeat.png",
+            "图 8：购买用户的事件次数分布",
+            "比较一次与多次购买事件的用户数，仅统计购买用户；缺少订单号，不能解释为真实订单复购率。",
+        ),
+    ]
+    for index, (title, filename, heading, caption) in enumerate(charts):
+        if index % 2 == 0:
+            story.append(PageBreak())
+            paragraph(title, "TitleCN")
+        else:
+            story.append(Spacer(1, 12))
+        paragraph(heading, "SectionCN")
+        story.append(
+            Image(str(root / "reports/figures" / filename), width=495, height=270)
+        )
+        paragraph(caption, "CaptionCN")
+
+    def footer(canvas, doc) -> None:
+        """绘制周报页码。
+
+        Args:
+            canvas: PDF 绘图对象。
+            doc: 当前文档。
+        """
+        canvas.saveState()
+        canvas.setFont("STSong-Light", 9)
+        canvas.setFillColor(colors.HexColor("#647480"))
+        canvas.drawString(48, 23, "第一周工作汇报 | 2026-11-13")
+        canvas.drawRightString(547, 23, f"{doc.page}")
+        canvas.restoreState()
+
+    document.build(story, onFirstPage=footer, onLaterPages=footer)
 
 
 def main() -> None:
