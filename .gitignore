@@ -13,3 +13,8 @@ data/
 .env
 reports/models/
 reports/private/
+build/
+dist/
+.env.*
+*.pem
+*.key

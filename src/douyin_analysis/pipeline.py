@@ -55,15 +55,14 @@ def clean_data(connection: duckdb.DuckDBPyConnection, source: Path) -> dict:
                try_cast(behavior_type AS INTEGER) AS behavior
         FROM raw
         """)
-    valid = """
-        event_time IS NOT NULL AND behavior IN (1, 2, 3, 4)
-        AND regexp_full_match(user_id, '[0-9]+')
-        AND regexp_full_match(item_id, '[0-9]+')
-        AND regexp_full_match(item_category, '[0-9]+')
-    """
-    connection.execute(
-        f"CREATE OR REPLACE TABLE valid AS SELECT * FROM parsed WHERE {valid}"
-    )
+    connection.execute("""
+        CREATE OR REPLACE TABLE valid AS
+        SELECT * FROM parsed
+        WHERE event_time IS NOT NULL AND behavior IN (1, 2, 3, 4)
+          AND regexp_full_match(user_id, '[0-9]+')
+          AND regexp_full_match(item_id, '[0-9]+')
+          AND regexp_full_match(item_category, '[0-9]+')
+        """)
     connection.execute("""
         CREATE OR REPLACE TABLE events AS
         SELECT user_id, item_id, item_category AS category_id,

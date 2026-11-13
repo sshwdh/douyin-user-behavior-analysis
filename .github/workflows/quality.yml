@@ -14,7 +14,7 @@ jobs:
       - run: black --check src tests scripts
       - run: isort --check-only src tests scripts
       - run: flake8 src tests scripts
-      - run: mypy src
+      - run: mypy src scripts
       - run: pylint src
       - run: python scripts/check_project_rules.py
       - run: pytest -q

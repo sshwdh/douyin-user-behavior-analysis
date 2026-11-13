@@ -32,6 +32,24 @@ def check_file(path: Path) -> list[str]:
             arguments = node.args.posonlyargs + node.args.args + node.args.kwonlyargs
             if node.returns is None or any(arg.annotation is None for arg in arguments):
                 errors.append(f"{path}:{node.lineno}: 缺少类型注解")
+        if isinstance(node, ast.ExceptHandler) and node.type is None:
+            errors.append(f"{path}:{node.lineno}: 不允许裸 except")
+        if isinstance(node, ast.Import) and len(node.names) > 1:
+            errors.append(f"{path}:{node.lineno}: 每个 import 只导入一个模块")
+        if isinstance(node, ast.ImportFrom) and any(
+            alias.name == "*" for alias in node.names
+        ):
+            errors.append(f"{path}:{node.lineno}: 不允许通配符导入")
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            if node.func.attr in {"execute", "executemany", "executescript", "sql"}:
+                if node.args and isinstance(node.args[0], (ast.JoinedStr, ast.BinOp)):
+                    errors.append(f"{path}:{node.lineno}: SQL 不允许字符串拼接")
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            defaults = node.args.defaults + node.args.kw_defaults
+            if any(
+                isinstance(value, (ast.List, ast.Dict, ast.Set)) for value in defaults
+            ):
+                errors.append(f"{path}:{node.lineno}: 不允许可变默认参数")
         if isinstance(node, ast.ImportFrom) and node.level:
             errors.append(f"{path}:{node.lineno}: 不允许相对导入")
     previous = None

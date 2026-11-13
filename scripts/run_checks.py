@@ -12,7 +12,7 @@ def main() -> None:
         ["-m", "black", "--check", "src", "tests", "scripts"],
         ["-m", "isort", "--check-only", "src", "tests", "scripts"],
         ["-m", "flake8", "src", "tests", "scripts"],
-        ["-m", "mypy", "src"],
+        ["-m", "mypy", "src", "scripts"],
         ["-m", "pylint", "src"],
         ["scripts/check_project_rules.py"],
         ["-m", "pytest", "-q"],

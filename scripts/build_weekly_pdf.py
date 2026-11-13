@@ -9,6 +9,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import (
     Image,
     PageBreak,
@@ -237,7 +238,7 @@ def build(root: Path) -> None:
         )
         paragraph(caption, "CaptionCN")
 
-    def footer(canvas, doc) -> None:
+    def footer(canvas: Canvas, doc: SimpleDocTemplate) -> None:
         """绘制周报页码。
 
         Args:
