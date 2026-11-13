@@ -1,9 +1,9 @@
-UTC: 2026-11-12T16:59:13.049952+00:00
+UTC: 2026-11-13T08:35:02.026505+00:00
 3.12.2 (main, Feb  6 2024, 20:19:44) [Clang 15.0.0 (clang-1500.1.0.2.5)]
 COMMAND: python -m black --check src tests scripts
 
 All done! ✨ 🍰 ✨
-13 files would be left unchanged.
+14 files would be left unchanged.
 
 EXIT: 0
 COMMAND: python -m isort --check-only src tests scripts
@@ -14,8 +14,8 @@ COMMAND: python -m flake8 src tests scripts
 
 
 EXIT: 0
-COMMAND: python -m mypy src
-Success: no issues found in 6 source files
+COMMAND: python -m mypy src scripts
+Success: no issues found in 10 source files
 
 
 EXIT: 0
@@ -33,8 +33,8 @@ PDF-specific coding rules passed.
 
 EXIT: 0
 COMMAND: python -m pytest -q
-........                                                                 [100%]
-8 passed in 1.68s
+.........                                                                [100%]
+9 passed in 7.39s
 
 
 EXIT: 0
