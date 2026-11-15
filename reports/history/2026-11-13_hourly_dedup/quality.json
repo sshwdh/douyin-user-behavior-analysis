@@ -1,0 +1,13 @@
+{
+  "raw_rows": 12256906,
+  "invalid_rows": 0,
+  "duplicate_rows": 6043527,
+  "clean_rows": 6213379,
+  "items_with_multiple_categories": 0,
+  "source_sha256": "64c1436d3f984f813c12c730950d61cdc1892e8dbbb54e102911b182c2690072",
+  "users": 10000,
+  "items": 2876947,
+  "categories": 8916,
+  "start": "2025-11-18 00:00:00",
+  "end": "2025-12-18 23:00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "rule": "user_behavior_hour > 100: quarantine whole group",
+  "independent_groupby_multiset_match": true,
+  "row_conservation": true,
+  "retained_repeated_groups": 3401086,
+  "raw_rows": 12256906,
+  "quarantined_rows": 1316083,
+  "retained_rows": 10940823
+}
