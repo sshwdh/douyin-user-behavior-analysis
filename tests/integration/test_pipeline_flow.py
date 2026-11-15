@@ -38,11 +38,11 @@ def test_pipeline_preserves_published_report(tmp_path: Path) -> None:
     render(tmp_path)
     create_reports(tmp_path)
 
-    # Assert: 重复折叠、持久化、绘图和报告均可追溯。
+    # Assert: 正常重复保留、持久化、绘图和报告均可追溯。
     result = query_frame(tmp_path / "data/behavior.sqlite", "SELECT * FROM events")
-    assert len(result) == 5
+    assert len(result) == 6
     assert set(result["user_id"]) == {"001"}
-    assert pd.read_csv(tmp_path / "reports/behavior.csv")["events"].sum() == 5
+    assert pd.read_csv(tmp_path / "reports/behavior.csv")["events"].sum() == 6
     assert len(list((tmp_path / "reports/figures").glob("*.png"))) == 9
-    assert "40.00%" in (tmp_path / "reports/analysis_report.md").read_text()
+    assert "33.33%" in (tmp_path / "reports/analysis_report.md").read_text()
     assert weekly.read_text(encoding="utf-8") == "已发布的独立周报\n"

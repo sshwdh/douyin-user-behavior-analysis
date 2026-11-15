@@ -59,7 +59,7 @@ def build_database(root: Path) -> None:
             ALTER TABLE events DROP COLUMN category_id;
             INSERT INTO times SELECT DISTINCT event_time,substr(event_time,1,10),
                 CAST(substr(event_time,12,2) AS INTEGER) FROM events;
-            CREATE UNIQUE INDEX idx_event_key
+            CREATE INDEX idx_event_key
                 ON events(user_id,item_id,behavior_type,event_time);
             CREATE INDEX idx_event_time ON events(event_time);
             CREATE INDEX idx_item_behavior ON events(item_id,behavior_type);

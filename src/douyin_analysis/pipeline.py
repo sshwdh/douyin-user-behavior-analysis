@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 from pathlib import Path
+from typing import Literal
 
 import duckdb
 
@@ -28,19 +29,32 @@ def file_digest(path: Path) -> str:
     return digest.hexdigest()
 
 
-def clean_data(connection: duckdb.DuckDBPyConnection, source: Path) -> dict:
-    """校验字段并按四元组全局去重；修改连接中的工作表。
+def clean_data(
+    connection: duckdb.DuckDBPyConnection,
+    source: Path,
+    threshold: int = 100,
+    scope: Literal[
+        "user_behavior_hour", "user_item_behavior_hour"
+    ] = "user_behavior_hour",
+) -> dict:
+    """校验字段并隔离超阈值组，保留正常重复交互；修改连接中的表。
 
     Args:
         connection: 工作数据库连接。
         source: CSV 文件路径。
+        threshold: 每组允许的最大事件次数，等于阈值仍全部保留。
+        scope: 按用户行为小时或用户商品行为小时分组。
 
     Returns:
-        原始行数、无效行数、重复行数及类目冲突计数。
+        原始、无效、隔离和保留行数，以及阈值规则与类目冲突。
 
     Raises:
         ValueError: 字段不匹配或无有效记录。
     """
+    if isinstance(threshold, bool) or not isinstance(threshold, int) or threshold < 1:
+        raise ValueError("threshold 必须是正整数")
+    if scope not in {"user_behavior_hour", "user_item_behavior_hour"}:
+        raise ValueError("不支持的频次分组 scope")
     connection.execute(
         "CREATE OR REPLACE TABLE raw AS SELECT * FROM read_csv(?, all_varchar=true)",
         [str(source.resolve())],
@@ -63,16 +77,26 @@ def clean_data(connection: duckdb.DuckDBPyConnection, source: Path) -> dict:
           AND regexp_full_match(item_id, '[0-9]+')
           AND regexp_full_match(item_category, '[0-9]+')
         """)
-    connection.execute("""
-        CREATE OR REPLACE TABLE events AS
+    connection.execute(
+        """CREATE OR REPLACE TABLE scored AS
+        SELECT *, count(*) OVER (
+            PARTITION BY user_id, behavior, event_time,
+                CASE WHEN ? = 'user_item_behavior_hour' THEN item_id ELSE '' END
+        ) AS group_count FROM valid""",
+        [scope],
+    )
+    connection.execute(
+        """CREATE OR REPLACE TABLE quarantined AS
+        SELECT * FROM scored WHERE group_count > ?""",
+        [threshold],
+    )
+    connection.execute(
+        """CREATE OR REPLACE TABLE events AS
         SELECT user_id, item_id, item_category AS category_id,
                behavior AS behavior_type, event_time
-        FROM valid
-        QUALIFY row_number() OVER (
-            PARTITION BY user_id, item_id, behavior, event_time
-            ORDER BY item_category
-        ) = 1
-        """)
+        FROM scored WHERE group_count <= ?""",
+        [threshold],
+    )
     raw_count = connection.execute("SELECT count(*) FROM raw").fetchall()[0][0]
     valid_count = connection.execute("SELECT count(*) FROM valid").fetchall()[0][0]
     clean_count = connection.execute("SELECT count(*) FROM events").fetchall()[0][0]
@@ -87,7 +111,12 @@ def clean_data(connection: duckdb.DuckDBPyConnection, source: Path) -> dict:
     return {
         "raw_rows": raw_count,
         "invalid_rows": raw_count - valid_count,
-        "duplicate_rows": valid_count - clean_count,
+        "quarantined_rows": valid_count - clean_count,
+        "deduplicated_rows": 0,
+        "rule_version": "hourly_frequency_v2",
+        "threshold": threshold,
+        "frequency_scope": scope,
+        "action": "quarantine_entire_group_above_threshold",
         "clean_rows": clean_count,
         "items_with_multiple_categories": conflicts,
     }
@@ -102,14 +131,21 @@ def export_results(connection: duckdb.DuckDBPyConnection, root: Path) -> None:
     """
     data_path = root / "data/processed/events.parquet"
     connection.sql("SELECT * FROM events").write_parquet(str(data_path))
+    connection.sql("SELECT * FROM quarantined").write_parquet(
+        str(root / "data/processed/quarantined.parquet")
+    )
     queries = {
-        "dedup_sensitivity": """WITH before AS (
+        "filter_sensitivity": """WITH before AS (
             SELECT behavior AS behavior_type,count(*) AS raw_valid_events
             FROM valid GROUP BY 1), after AS (
             SELECT behavior_type,count(*) AS clean_events FROM events GROUP BY 1)
-            SELECT *,raw_valid_events-clean_events AS removed_events,
-            1.0*(raw_valid_events-clean_events)/raw_valid_events AS removed_share
-            FROM before JOIN after USING(behavior_type) ORDER BY behavior_type""",
+            SELECT behavior_type,raw_valid_events,
+            coalesce(clean_events,0) AS clean_events,
+            raw_valid_events-coalesce(clean_events,0) AS quarantined_events,
+            1.0*(raw_valid_events-coalesce(clean_events,0))/raw_valid_events
+                AS quarantined_share
+            FROM before LEFT JOIN after USING(behavior_type)
+            ORDER BY behavior_type""",
         "duplicate_multiplicity": """WITH keys AS (
             SELECT count(*) AS multiplicity FROM valid
             GROUP BY user_id,item_id,behavior,event_time)
@@ -171,19 +207,28 @@ def export_results(connection: duckdb.DuckDBPyConnection, root: Path) -> None:
         )
 
 
-def run(source: Path, root: Path) -> None:
+def run(
+    source: Path,
+    root: Path,
+    threshold: int = 100,
+    scope: Literal[
+        "user_behavior_hour", "user_item_behavior_hour"
+    ] = "user_behavior_hour",
+) -> None:
     """运行全量分析，保存来源指纹及质量报告。
 
     Args:
         source: 原始 CSV。
         root: 输出项目目录。
+        threshold: 频次隔离阈值。
+        scope: 频次统计分组。
     """
     for directory in ["data/processed", "reports", "reports/figures"]:
         (root / directory).mkdir(parents=True, exist_ok=True)
     with duckdb.connect(str(root / "data/work.duckdb")) as connection:
         connection.execute("SET memory_limit='2GB'")
         connection.execute("SET threads=4")
-        quality = clean_data(connection, source)
+        quality = clean_data(connection, source, threshold, scope)
         quality["source_sha256"] = file_digest(source)
         summary = connection.execute(
             """SELECT count(DISTINCT user_id),count(DISTINCT item_id),
@@ -205,9 +250,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--threshold", type=int, default=100)
+    parser.add_argument(
+        "--scope",
+        choices=["user_behavior_hour", "user_item_behavior_hour"],
+        default="user_behavior_hour",
+    )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
-    run(args.input, args.root.resolve())
+    run(args.input, args.root.resolve(), args.threshold, args.scope)
 
 
 if __name__ == "__main__":

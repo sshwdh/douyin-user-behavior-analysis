@@ -21,7 +21,7 @@ def validate(root: Path) -> dict[str, bool]:
     raw = json.loads((root / "reports/raw_profile.json").read_text(encoding="utf-8"))
     assert raw["rows"] == quality["raw_rows"]
     assert quality["raw_rows"] == sum(
-        quality[name] for name in ["invalid_rows", "duplicate_rows", "clean_rows"]
+        quality[name] for name in ["invalid_rows", "quarantined_rows", "clean_rows"]
     )
     source = parquet.ParquetFile(root / "data/processed/events.parquet")
     assert source.metadata.num_rows == quality["clean_rows"]
