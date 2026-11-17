@@ -46,6 +46,12 @@ def create_reports(root: Path) -> None:
         "口径：保留正常重复记录；超过阈值的整组记录进入本地隔离区，不直接认定为恶意数据。",
         f"隔离比例 {quality['quarantined_rows'] / quality['raw_rows']:.2%}。",
         f"频次分组：{quality['frequency_scope']}；阈值：{quality['threshold']}。",
+        (
+            "当前未触发超阈值处置；未来批次触发时须确认处置策略。"
+            if quality["quarantined_rows"] == 0
+            else "当前存在超阈值隔离组，处置是否适用于主分析须结合业务确认。"
+        ),
+        "行为码映射、业务时区及采集完整性仍待确认。",
         "逐行为影响见 filter_sensitivity.csv；历史重复分布仅作诊断，不再作为去重依据。",
         "未按 IQR 删除重度用户或活动日峰值。没有订单号和金额，购买事件不是订单/GMV。",
         "",

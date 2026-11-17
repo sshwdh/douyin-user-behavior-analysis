@@ -26,7 +26,9 @@ def test_audit_detects_changed_data(
         encoding="utf-8",
     )
     run(source, tmp_path)
-    result = audit(tmp_path, source, date(2026, 11, 16))
+    result = audit(tmp_path, source, date(2026, 11, 16), scope_confirmed=True)
+    assert result["semantic_confirmations"]["frequency_scope"] == "confirmed"
+    assert result["semantic_confirmations"]["behavior_code_meanings"] == "pending"
     assert result["parquet_multiset_matches_rule"]
     assert result["coverage"]["missing_hours"] == ["2025-11-18T01:00:00"]
     assert result["status"] == "provisional_not_business_approved"

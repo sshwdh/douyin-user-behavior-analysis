@@ -35,7 +35,7 @@ def clean_data(
     threshold: int = 100,
     scope: Literal[
         "user_behavior_hour", "user_item_behavior_hour"
-    ] = "user_behavior_hour",
+    ] = "user_item_behavior_hour",
 ) -> dict:
     """校验字段并隔离超阈值组，保留正常重复交互；修改连接中的表。
 
@@ -113,7 +113,7 @@ def clean_data(
         "invalid_rows": raw_count - valid_count,
         "quarantined_rows": valid_count - clean_count,
         "deduplicated_rows": 0,
-        "rule_version": "hourly_frequency_v2",
+        "rule_version": "hourly_frequency_v3",
         "threshold": threshold,
         "frequency_scope": scope,
         "action": "quarantine_entire_group_above_threshold",
@@ -213,7 +213,7 @@ def run(
     threshold: int = 100,
     scope: Literal[
         "user_behavior_hour", "user_item_behavior_hour"
-    ] = "user_behavior_hour",
+    ] = "user_item_behavior_hour",
 ) -> None:
     """运行全量分析，保存来源指纹及质量报告。
 
@@ -254,7 +254,7 @@ def main() -> None:
     parser.add_argument(
         "--scope",
         choices=["user_behavior_hour", "user_item_behavior_hour"],
-        default="user_behavior_hour",
+        default="user_item_behavior_hour",
     )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)

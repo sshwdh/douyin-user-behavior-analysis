@@ -1,0 +1,3 @@
+scope,groups,max_frequency,p95,p99,p999
+user_behavior_hour,963962,792,52.0,101.0,181.0
+user_item_behavior_hour,6213379,22,4.0,6.0,9.0

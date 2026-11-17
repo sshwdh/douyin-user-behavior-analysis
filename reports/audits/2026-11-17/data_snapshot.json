@@ -1,0 +1,47 @@
+{
+  "snapshot_id": "provisional-2cacdd7b8760d553",
+  "audit_date": "2026-11-17",
+  "audited_at_utc": "2026-11-17T11:29:38.130679+00:00",
+  "status": "provisional_not_business_approved",
+  "source_sha256": "64c1436d3f984f813c12c730950d61cdc1892e8dbbb54e102911b182c2690072",
+  "rule": {
+    "rule_version": "hourly_frequency_v3",
+    "threshold": 100,
+    "frequency_scope": "user_item_behavior_hour",
+    "action": "quarantine_entire_group_above_threshold",
+    "normal_repetitions": "preserve_all",
+    "threshold_boundary": "strictly_greater_than"
+  },
+  "artifacts": {
+    "data/processed/events.parquet": {
+      "sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+      "bytes": 139420251
+    },
+    "data/processed/quarantined.parquet": {
+      "sha256": "1a4ab26bd72996cc6487d164d375aafdf2423f9f05a37a87cf300e4219237d87",
+      "bytes": 263
+    },
+    "reports/quality.json": {
+      "sha256": "ff5eb8a46b2e9333d4d10d0a6b1094bd27822a688b4601d97e70ec6b60797aca",
+      "bytes": 541
+    }
+  },
+  "coverage": {
+    "start": "2025-11-18T00:00:00",
+    "end": "2025-12-18T23:00:00",
+    "expected_hours": 744,
+    "observed_hours": 744,
+    "missing_hours": [],
+    "collection_completeness": "unconfirmed",
+    "timezone": "unconfirmed; original naive timestamps preserved"
+  },
+  "parquet_multiset_matches_rule": true,
+  "quarantine_count_matches": true,
+  "semantic_confirmations": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  }
+}

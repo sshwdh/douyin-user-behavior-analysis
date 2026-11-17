@@ -1,0 +1,7 @@
+scope,threshold,quarantined_groups,quarantined_rows,valid_rows,quarantined_share
+user_behavior_hour,50,50896,4122585.0,12256906.0,0.33634793315703
+user_behavior_hour,100,9681,1316083.0,12256906.0,0.10737481383964273
+user_behavior_hour,200,583,146467.0,12256906.0,0.011949753061661728
+user_item_behavior_hour,50,0,0.0,12256906.0,0.0
+user_item_behavior_hour,100,0,0.0,12256906.0,0.0
+user_item_behavior_hour,200,0,0.0,12256906.0,0.0

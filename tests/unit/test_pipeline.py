@@ -1,4 +1,4 @@
-"""验证清洗口径、跨行去重和异常输入。"""
+"""验证清洗口径、重复保留和异常输入。"""
 
 from pathlib import Path
 
@@ -85,7 +85,7 @@ def test_hourly_threshold(tmp_path: Path, count: int) -> None:
 
 @pytest.mark.parametrize(
     ("scope", "expected"),
-    [("user_behavior_hour", 1), ("user_item_behavior_hour", 121)],
+    [("user_behavior_hour", 1), ("user_item_behavior_hour", 121), ("default", 121)],
 )
 def test_frequency_scope(tmp_path: Path, scope: str, expected: int) -> None:
     """跨商品累积与按商品分组必须得到不同且明确的结果。"""
@@ -96,7 +96,11 @@ def test_frequency_scope(tmp_path: Path, scope: str, expected: int) -> None:
     lines.append("2025-12-01 01,001,2,3,4")
     source.write_text("\n".join(lines), encoding="utf-8")
     with duckdb.connect() as connection:
-        result = clean_data(connection, source, scope=scope)
+        result = (
+            clean_data(connection, source)
+            if scope == "default"
+            else clean_data(connection, source, scope=scope)
+        )
         assert result["clean_rows"] == expected
 
 

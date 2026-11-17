@@ -29,6 +29,13 @@ def build(root: Path) -> None:
         root: 项目根目录。
     """
     quality = json.loads((root / "reports/quality.json").read_text(encoding="utf-8"))
+    if (
+        quality["frequency_scope"] != "user_item_behavior_hour"
+        or quality["threshold"] != 100
+        or quality["clean_rows"] != 12_256_906
+        or quality["quarantined_rows"] != 0
+    ):
+        raise ValueError("本报告仅适用于 11/17 确认的全量保留版本")
     pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
     styles = getSampleStyleSheet()
     for style in styles.byName.values():
@@ -71,13 +78,13 @@ def build(root: Path) -> None:
     output = root / "output/pdf"
     output.mkdir(parents=True, exist_ok=True)
     document = SimpleDocTemplate(
-        str(output / "2026-11-15_第一周项目汇报_口径修订.pdf"),
+        str(output / "2026-11-17_第一周项目汇报_口径确认版.pdf"),
         pagesize=A4,
         rightMargin=48,
         leftMargin=48,
         topMargin=42,
         bottomMargin=42,
-        title="第一周项目汇报修订 - 抖音商城用户行为分析",
+        title="第一周项目汇报口径确认 - 抖音商城用户行为分析",
         author="sshwdh",
     )
     story = []
@@ -88,26 +95,28 @@ def build(root: Path) -> None:
 
     behavior = pd.read_csv(root / "reports/behavior.csv")
     daily = pd.read_csv(root / "reports/daily.csv")
+    hourly = pd.read_csv(root / "reports/hourly.csv")
+    peak_hour = int(hourly.iloc[int(hourly["events"].argmax())]["hour"])
     funnel = pd.read_csv(root / "reports/funnel.csv").iloc[0]
     purchases = int(behavior.loc[behavior.behavior_type == 4, "events"].iloc[0])
     peak = daily.iloc[int(daily["events"].argmax())]
-    paragraph("第一周项目汇报 · 口径修订", "TitleCN")
+    paragraph("第一周项目汇报 · 口径确认", "TitleCN")
     paragraph("抖音商城用户行为数据分析", "SectionCN")
-    paragraph("原汇报周期：2026-11-06 至 2026-11-13　｜　修订：2026-11-15")
+    paragraph("原汇报周期：2026-11-06 至 2026-11-13　｜　修订：2026-11-17")
     paragraph(
         "依据带教反馈，撤销小时四元组全局去重。原规则会合并正常重复交互，"
         + "原周报的事件频次和相关模型指标不再作为当前结论。"
     )
-    paragraph("一、暂行修正规则与确认边界", "SectionCN")
+    paragraph("一、已确认规则与适用边界", "SectionCN")
     paragraph(
-        "同一用户、同一行为、同一自然小时跨商品累计：100 次及以下全部保留；"
-        + "超过 100 次的整组记录进入本地隔离区。原始 CSV 保持不变。"
+        "已确认按同一用户、同一商品、同一行为、同一自然小时统计频次；"
+        + "本批最高 22 次，无超过 100 次的组，全部有效记录保留，不去重、不隔离。"
     )
     paragraph(
-        "待确认：阈值是否应跨商品累计，以及超阈值是否整组隔离。"
-        + "100 次为启发式筛查阈值，超阈值不等于已经证明恶意行为。"
+        "带教通过用户确认采用上述分组并保留全部记录。原始 CSV 保持不变。"
+        + "未来若出现超过 100 次的组，仍需确认处置；行为码、时区及采样完整性待确认。"
     )
-    paragraph("二、实际重跑结果（上述暂行口径）", "SectionCN")
+    paragraph("二、实际重跑结果（已确认分组）", "SectionCN")
     table = Table(
         [
             ["指标", "结果"],
@@ -150,14 +159,14 @@ def build(root: Path) -> None:
     )
     story.append(PageBreak())
     paragraph("修正依据、验证与后续安排", "TitleCN")
-    paragraph("三、分组范围为何必须确认", "SectionCN")
+    paragraph("三、确认依据与历史版本更正", "SectionCN")
     paragraph(
         "按用户、商品、行为、小时分组，最大频次仅 22，没有超过 100 次的组；"
         + "按用户、行为、小时跨商品累计，最大频次 792，超过 100 次共 9,681 组。"
     )
     paragraph(
-        "当前暂用跨商品分组，并提供 50/100/200 三档阈值的敏感性对照。"
-        + "若带教要求按同商品统计，阈值 100 下本批有效记录将全部保留，需相应重跑。"
+        "此前跨商品暂行隔离的 1,316,083 条已全部恢复，相关旧结果单独归档。"
+        + "当前主结果基于全部有效记录；保留两种分组及 50/100/200 次敏感性表供追溯。"
     )
     paragraph("四、工程修正与验证", "SectionCN")
     paragraph(
@@ -170,7 +179,7 @@ def build(root: Path) -> None:
     )
     paragraph(
         "旧模型指标已移入历史归档并标记失效。新口径下模型尚未重跑，"
-        + "待规则确认后再进行基线实验；本次不新增后续阶段模型。"
+        + "后续结合行为码和样本边界确认开展基线实验；本次不新增后续阶段模型。"
     )
     paragraph("五、已完成工作与方法总结", "SectionCN")
     paragraph(
@@ -179,15 +188,15 @@ def build(root: Path) -> None:
     )
     paragraph("六、下一周安排：11/16 - 11/20", "SectionCN")
     for text in [
-        "周一：与带教确认频次分组、阈值及隔离方式，冻结数据口径。",
-        "周二：据确认结果完善用户、商品、交互窗口特征及字典。",
-        "周三：检查候选覆盖、标签边界与防泄漏测试。",
-        "周四：在新口径上重跑 LR，条件满足后开展树模型对照。",
-        "周五：汇总实验、限制及下周计划，提交第二周报告。",
+        "周一（已完成）：数据覆盖核验、暂行快照及两种分组对比。",
+        "周二（本次）：落实分组确认，全量重跑、交叉核验并更新报告与八图。",
+        "周三（计划）：完善窗口特征字典，检查候选覆盖及防泄漏。",
+        "周四（计划）：语义与标签条件明确后重跑 LR，树模型按进度安排。",
+        "周五（计划）：按实际完成情况整理第二周报告及下一周安排。",
     ]:
         paragraph(text)
     paragraph("仓库：https://github.com/sshwdh/douyin-user-behavior-analysis")
-    paragraph("八张图均基于本次暂行规则；历史结果独立归档，不与当前结果混用。")
+    paragraph("八张图均基于本次全量保留结果；旧去重及跨商品隔离结果仅供追溯。")
     charts = [
         (
             "行为结构与活跃趋势",
@@ -211,7 +220,7 @@ def build(root: Path) -> None:
             "",
             "04_hourly.png",
             "图 4：一天内各小时的事件分布",
-            "将观察期全部日期按小时汇总，22 时事件最多；使用原始时间值，业务时区待确认。",
+            f"观察期按小时汇总，{peak_hour} 时事件最多；使用原始时间值，业务时区待确认。",
         ),
         (
             "类目偏好与星期分布",
@@ -260,7 +269,7 @@ def build(root: Path) -> None:
         canvas.saveState()
         canvas.setFont("STSong-Light", 9)
         canvas.setFillColor(colors.HexColor("#647480"))
-        canvas.drawString(48, 23, "第一周工作汇报修订 | 2026-11-15")
+        canvas.drawString(48, 23, "第一周工作汇报修订 | 2026-11-17")
         canvas.drawRightString(547, 23, f"{doc.page}")
         canvas.restoreState()
 

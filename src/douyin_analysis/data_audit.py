@@ -64,13 +64,16 @@ def snapshot_id(source_digest: str, rule: dict, output_digest: str) -> str:
     return f"provisional-{digest[:16]}"
 
 
-def audit(root: Path, source: Path, audit_date: date) -> dict:
+def audit(
+    root: Path, source: Path, audit_date: date, scope_confirmed: bool = False
+) -> dict:
     """核验当前数据并导出日汇总及暂行快照，不修改清洗产物。
 
     Args:
         root: 项目目录。
         source: 原始 CSV 路径。
         audit_date: 核验日期，用于独立保存记录。
+        scope_confirmed: 是否已有该分组范围的业务确认，不代表其他语义已确认。
 
     Returns:
         带覆盖检查、指纹和业务确认状态的清单。
@@ -178,7 +181,7 @@ def audit(root: Path, source: Path, audit_date: date) -> dict:
         "parquet_multiset_matches_rule": True,
         "quarantine_count_matches": True,
         "semantic_confirmations": {
-            "frequency_scope": "pending",
+            "frequency_scope": "confirmed" if scope_confirmed else "pending",
             "whole_group_quarantine": "pending",
             "behavior_code_meanings": "pending",
             "timezone": "pending",
@@ -209,7 +212,10 @@ def plot_daily_impact(output: Path) -> None:
     axes[1].set_xlabel("Date in source data (timezone unconfirmed)")
     for axis in axes:
         axis.grid(axis="y", alpha=0.2)
-    figure.suptitle("Provisional rule: user + behavior + hour; count > 100")
+    manifest = json.loads((output / "data_snapshot.json").read_text(encoding="utf-8"))
+    rule = manifest["rule"]
+    scope = rule["frequency_scope"].replace("_", " + ")
+    figure.suptitle(f"Frequency check: {scope}; count > {rule['threshold']}")
     figure.autofmt_xdate()
     figure.tight_layout()
     figure.savefig(output / "daily_filter_impact.png", dpi=150)
@@ -222,8 +228,9 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--date", type=date.fromisoformat, required=True)
+    parser.add_argument("--scope-confirmed", action="store_true")
     args = parser.parse_args()
-    result = audit(args.root, args.input, args.date)
+    result = audit(args.root, args.input, args.date, args.scope_confirmed)
     plot_daily_impact(args.root / "reports/audits" / args.date.isoformat())
     print(result["snapshot_id"])
 
