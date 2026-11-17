@@ -1,0 +1,26 @@
+{
+  "data_snapshot_id": "provisional-2cacdd7b8760d553",
+  "events_sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+  "code_sha256": "e4dc55de1275e4a3eca4ed322d09122e3d326e6435f6a3e8d67f6677c8cb3854",
+  "splits": [
+    "train",
+    "validation"
+  ],
+  "test_evaluated": false,
+  "semantics": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  },
+  "status": "candidate_diagnostics_only_no_expanded_model",
+  "ranking": "historical distinct users; ties by item_id",
+  "preferences": "top 3 categories by historical distinct items; ties by category_id",
+  "rules": [
+    "history_7d",
+    "global_20",
+    "global_50",
+    "category_3x10"
+  ]
+}

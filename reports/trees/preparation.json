@@ -1,0 +1,103 @@
+{
+  "status": "prepared_not_trained",
+  "feature_manifest_sha256": "14254dd3e018068a67dbf74749310d883bbfe19bfc60373c602075cd0a73569f",
+  "code_sha256": "7688192c7048c824aff7c337d060a6ea1980e6cd08e64fe5b7d7ef2d010b0e66",
+  "data_snapshot_id": "provisional-2cacdd7b8760d553",
+  "semantic_confirmations": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  },
+  "samples": {
+    "train": {
+      "sha256": "7057e956c15bd6f2956aeefa45aae2d14e36f5cc3a0305a24150d7d001da89e9",
+      "rows": 1030893
+    },
+    "validation": {
+      "sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+      "rows": 1061515
+    }
+  },
+  "features": [
+    "pair_events",
+    "pair_pv",
+    "pair_fav",
+    "pair_cart",
+    "pair_buy",
+    "pair_recency_hours",
+    "user_events",
+    "user_buy",
+    "item_events",
+    "item_buy",
+    "pair_active_days",
+    "pair_distinct_hours",
+    "user_pv",
+    "user_fav",
+    "user_cart",
+    "user_distinct_items",
+    "user_active_days",
+    "user_recency_hours",
+    "user_buy_recency_hours",
+    "user_has_buy",
+    "item_users",
+    "item_buyers",
+    "item_active_days",
+    "item_buyer_rate"
+  ],
+  "transform": "raw numeric values; no scaler; no resampling",
+  "variants": {
+    "hgb_15": {
+      "categorical_features": "from_dtype",
+      "class_weight": "balanced",
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 1.0,
+      "learning_rate": 0.05,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 150,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 50,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "hgb_31": {
+      "categorical_features": "from_dtype",
+      "class_weight": "balanced",
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 1.0,
+      "learning_rate": 0.05,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 150,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 50,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "selection": "validation average precision; ties prefer hgb_15",
+  "threshold": "maximum validation F1; ties prefer higher threshold",
+  "reference": "lr_24 validation AP=0.02782960959 on identical candidates",
+  "test_policy": "No test access; existing test was used by LR. Independent final evaluation requires a newly reserved dataset.",
+  "real_data_fit": false
+}

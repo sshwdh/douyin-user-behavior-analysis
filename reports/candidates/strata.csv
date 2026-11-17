@@ -1,0 +1,11 @@
+stratum,pairs,split,cutoff
+covered_pair,2735,train,2025-11-25
+known_user_unseen_item,12996,train,2025-11-25
+new_pair_known_user_known_item,5234,train,2025-11-25
+unseen_user_known_item,189,train,2025-11-25
+unseen_user_unseen_item,402,train,2025-11-25
+covered_pair,2525,validation,2025-12-02
+known_user_unseen_item,12840,validation,2025-12-02
+new_pair_known_user_known_item,5407,validation,2025-12-02
+unseen_user_known_item,185,validation,2025-12-02
+unseen_user_unseen_item,311,validation,2025-12-02
