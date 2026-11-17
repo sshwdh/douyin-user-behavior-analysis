@@ -1,0 +1,87 @@
+{
+  "status": "descriptive_validation_error_audit",
+  "selected_model": "hgb_31",
+  "threshold": 0.9371093235066793,
+  "model_sha256": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b",
+  "metrics_sha256": "f80382c55a7f5f54014be6b79d2478a24ef9a0deb50ce597e2cdce45176946e1",
+  "sample_sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+  "code_sha256": "7e616d4ae14148ea542b0b90c59e4f2827a76d08ba1f0f8f4c3bc7d924a20182",
+  "metrics_reproduced": {
+    "rows": 1061515,
+    "positives": 2525,
+    "positive_rate": 0.002378675760587462,
+    "roc_auc": 0.881827213656502,
+    "pr_auc_average_precision": 0.03932840231904845,
+    "accuracy": 0.993546016777907,
+    "precision": 0.0725296442687747,
+    "recall": 0.14534653465346534,
+    "f1": 0.09676994067237969,
+    "threshold": 0.9371093235066793,
+    "predicted_positive": 5060,
+    "true_positive": 367,
+    "false_positive": 4693,
+    "false_negative": 2158
+  },
+  "test_accessed": false,
+  "model_retrained": false,
+  "threshold_changed": false,
+  "bins": {
+    "user_events": [
+      "-1",
+      "100",
+      "500",
+      "2000",
+      "inf"
+    ],
+    "user_buy": [
+      "-1",
+      "0",
+      "5",
+      "inf"
+    ],
+    "user_distinct_items": [
+      "-1",
+      "50",
+      "200",
+      "inf"
+    ],
+    "item_users": [
+      "-1",
+      "1",
+      "5",
+      "20",
+      "inf"
+    ],
+    "item_buyers": [
+      "-1",
+      "0",
+      "1",
+      "inf"
+    ],
+    "pair_events": [
+      "-1",
+      "1",
+      "5",
+      "inf"
+    ],
+    "pair_buy": [
+      "-1",
+      "0",
+      "inf"
+    ],
+    "pair_recency_hours": [
+      "-1",
+      "24",
+      "72",
+      "inf"
+    ]
+  },
+  "bin_rule": "fixed descriptive intervals, right closed; no outcome-based search",
+  "semantics": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  }
+}
