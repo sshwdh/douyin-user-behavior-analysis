@@ -1,0 +1,192 @@
+"""从已完成的 LR 指标生成中文报告和固定阈值对照图。"""
+
+import argparse
+import json
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+from douyin_analysis.lr_experiment import EXPERIMENT
+
+
+def plot_metrics(models: dict, output: Path) -> None:
+    """对照排序指标和固定阈值分类指标，不调整实验参数。
+
+    Args:
+        models: 两组模型的已计算结果。
+        output: 实验产物目录。
+    """
+    plt.switch_backend("Agg")
+    names = list(models)
+    positions = np.arange(len(names))
+    figure, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+    for offset, split in [(-0.18, "validation"), (0.18, "test")]:
+        values = [models[name][split]["pr_auc_average_precision"] for name in names]
+        axes[0].bar(positions + offset, values, width=0.36, label=split)
+    axes[0].set_xticks(positions, names)
+    axes[0].set(title="Average precision (AP)", ylabel="AP")
+    for offset, metric in [(-0.25, "precision"), (0, "recall"), (0.25, "f1")]:
+        values = [models[name]["test"][metric] * 100 for name in names]
+        axes[1].bar(positions + offset, values, width=0.25, label=metric)
+    axes[1].set_xticks(positions, names)
+    axes[1].set(title="Test: thresholds fixed on validation", ylabel="Metric (%)")
+    for axis in axes:
+        axis.margins(y=0.25)
+        axis.legend()
+        axis.grid(axis="y", alpha=0.2)
+    figure.tight_layout()
+    figure.savefig(output / "metric_comparison.png", dpi=150)
+    plt.close(figure)
+
+
+def create_report(root: Path) -> None:
+    """只读取实际指标，生成阶段性离线实验报告。
+
+    Args:
+        root: 项目根目录。
+    """
+    output = root / "reports/experiments" / EXPERIMENT
+    metrics = json.loads((output / "metrics.json").read_text(encoding="utf-8"))
+    protocol = json.loads((output / "protocol.json").read_text(encoding="utf-8"))
+    models = metrics["models"]
+    selected = metrics["selected_by_validation"]
+    lines = [
+        "# LR 基线与窗口特征对照实验",
+        "",
+        "执行：2026-11-17。数据为确认分组后的全量保留版本。",
+        "旧四元组去重实验已失效，本报告不使用旧模型指标作增益对照。",
+        "",
+        "## 任务和适用边界",
+        "",
+        "在历史七日交互过的用户商品候选中，预测未来七日是否观测到行为码 4。",
+        "行为码 4 暂按购买解释，行为语义、业务时区、采样与采集完整性仍待确认。",
+        "负标签仅表示未观测到该行为，不证明用户没有购买。结果是离线样本实验，非线上效果。",
+        f"数据快照：`{protocol['data_snapshot_id']}`。",
+        "训练/验证/测试候选数分别为 1,030,893 / 1,061,515 / 1,117,324。",
+        "七日窗口及样本来源见[样本核验](../docs/10_窗口特征与样本核验.md)。",
+        "",
+        "## 预先固定的实验方案",
+        "",
+        "仅比较原 10 项与扩展 24 项特征，样本、类别权重和求解器一致。",
+        "计数与间隔使用 log1p；二元标记和比例保留原值；StandardScaler 只在训练集拟合。",
+        "LR：C=1、class_weight=balanced、lbfgs、max_iter=500、random_state=42。",
+        "没有重采样，没有网格调参。加权 LR 的输出用于排序和阈值判定，不视为校准购买概率。",
+        "方案按验证集 AP 选择；每个方案独立按验证集最大 F1 定阈值，并列取更高阈值。",
+        "验证决策写盘后才加载测试样本，同时评价两个预先指定的方案；不按测试结果换方案或阈值。",
+        f"按验证集 AP 选择的方案：**{selected}**。",
+        "AP 使用 average_precision_score，非梯形积分 PR 曲线面积。",
+        "",
+        "## 验证集结果",
+        "",
+        "| 方案 | AP | ROC-AUC | Precision | Recall | F1 | 固定阈值 |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ]
+    for name, model in models.items():
+        item = model["validation"]
+        lines.append(
+            f"| {name} | {item['pr_auc_average_precision']:.6f} | {item['roc_auc']:.6f}"
+            + f" | {item['precision']:.2%} | {item['recall']:.2%} | {item['f1']:.4f}"
+            + f" | {item['threshold']:.8f} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## 测试集结果",
+            "",
+            "| 方案 | AP | ROC-AUC | Precision | 候选内 Recall | F1 | 全部未来对 Recall |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for name, model in models.items():
+        item = model["test"]
+        lines.append(
+            f"| {name} | {item['pr_auc_average_precision']:.6f} | {item['roc_auc']:.6f}"
+            + f" | {item['precision']:.2%} | {item['recall']:.2%} | {item['f1']:.4f}"
+            + f" | {item['recall_all_future_pairs']:.2%} |"
+        )
+    lines.extend(
+        [
+            "",
+            "全部未来对 Recall = 正确预测的购买对 / 该标签窗全部行为码 4 对（31,583）。",
+            "候选只覆盖其中 5,175 对，覆盖率 16.39%，其余 26,408 对未进入模型。",
+            "这个汇总指标仍基于给定样本，不是全平台购买召回率。",
+            "",
+            "| 方案 | 预测正例 | 真正例 | 假正例 | 假负例（候选内） | 迭代次数 |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    for name, model in models.items():
+        item = model["test"]
+        lines.append(
+            f"| {name} | {item['predicted_positive']:,} | {item['true_positive']:,}"
+            + f" | {item['false_positive']:,} | {item['false_negative']:,}"
+            + f" | {model['iterations']} |"
+        )
+    delta = (
+        models["lr_24"]["test"]["pr_auc_average_precision"]
+        - models["lr_10"]["test"]["pr_auc_average_precision"]
+    )
+    lines.extend(
+        [
+            "",
+            "## 解释与限制",
+            "",
+            f"24 项特征的测试 AP 绝对差仅 {delta:.6f}，Precision 略升，Recall 和 F1 下降。",
+            "因此不能声称新增特征带来明显或全面改善；保留按验证 AP 冻结的选择，不事后改用测试 F1 选优。",
+            "测试正例率约 0.4632%；全部预测为负也有约 99.54% Accuracy，不能仅以准确率判断好坏。",
+            "两组模型均正常收敛。训练耗时见指标 JSON，仅含特征变换和拟合，不含数据读取和评价。",
+            "目前只有一个时间外测试窗口，未做统计显著性检验；不同日期、抽样方式和业务定义下效果可能变化。",
+            "完整样本已用于本轮测试；后续不得依据这个测试集反复调参并宣称独立最终验证。",
+            "系数属于经变换、标准化后的相关性方向，不代表因果贡献；共线性影响系数解释。",
+            "",
+            "## 结果图",
+            "",
+            "![指标对照](experiments/lr_2026-11-17/metric_comparison.png)",
+            "",
+            "![验证与测试 PR 曲线](experiments/lr_2026-11-17/precision_recall.png)",
+            "",
+            "## 验证与复现",
+            "",
+            "数据和样本指纹均核对；合成样本验证训练集独立缩放、验证阈值冻结、并列处理及旧样本拒绝。",
+            "规范检查和 30 项测试通过。结果保存代码经拆分后同参数复跑，全部评价指标一致，未用测试结果调参。",
+            "模型与缩放器保存在本地 data/models/，不上传用户明细或模型二进制。",
+            "",
+            "```bash",
+            "python -m douyin_analysis.lr_experiment",
+            "python -m douyin_analysis.experiment_report",
+            "python scripts/run_checks.py",
+            "```",
+            "",
+            "旧命令 python -m douyin_analysis.modeling 已转入上述固定样本实验入口。",
+            "再次执行会覆盖该实验目录；参数方案变化时应使用新的实验标识保存，避免混用。",
+            "",
+            "证据：[协议](experiments/lr_2026-11-17/protocol.json)、",
+            "[验证决策](experiments/lr_2026-11-17/validation_decision.json)、",
+            "[完整指标](experiments/lr_2026-11-17/metrics.json)、",
+            "[标准化系数](experiments/lr_2026-11-17/coefficients.csv)。",
+            "",
+            "## 下一步",
+            "",
+            "在固定样本上预先定义树模型对照，用训练和验证数据开展调参；同时研究候选覆盖不足。",
+            "多轮优化后的独立最终验证需另留未使用数据或补充数据，避免重复使用当前测试窗选优。",
+            "本轮尚未开展树模型、深度模型或线上 A/B 实验。",
+            "",
+        ]
+    )
+    (root / "reports/lr_baseline_report.md").write_text(
+        "\n".join(lines), encoding="utf-8"
+    )
+    plot_metrics(models, output)
+
+
+def main() -> None:
+    """生成当前 LR 实验的解释报告。"""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    args = parser.parse_args()
+    create_report(args.root)
+
+
+if __name__ == "__main__":
+    main()

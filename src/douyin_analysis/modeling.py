@@ -1,29 +1,14 @@
-"""历史候选用户商品对的七日购买预测基线，按时间外推评估。"""
+"""兼容旧样本检查接口；命令行转入固定样本的 LR 对照实验。"""
 
-import argparse
-import json
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import duckdb
-import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    accuracy_score,
-    average_precision_score,
-    f1_score,
-    precision_recall_curve,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
-from douyin_analysis.features import BASELINE_FEATURES
+from douyin_analysis.experiment_metrics import evaluate
+from douyin_analysis.lr_experiment import main, run
 
-FEATURES = BASELINE_FEATURES
+__all__ = ["build_samples", "evaluate", "run"]
 
 
 def build_samples(
@@ -85,105 +70,6 @@ def build_samples(
             cutoff + timedelta(days=7),
         ],
     ).df()
-
-
-def evaluate(labels: pd.Series, scores: np.ndarray, threshold: float) -> dict:
-    """计算自然类别比例下的指标，不调整测试阈值。
-
-    Args:
-        labels: 真实二值标签。
-        scores: 模型正类概率。
-        threshold: 验证集固定的分类阈值。
-
-    Returns:
-        分类与排序指标。
-    """
-    predictions = scores >= threshold
-    return {
-        "rows": len(labels),
-        "positives": int(labels.sum()),
-        "positive_rate": float(labels.mean()),
-        "roc_auc": float(roc_auc_score(labels, scores)),
-        "pr_auc_average_precision": float(average_precision_score(labels, scores)),
-        "accuracy": float(accuracy_score(labels, predictions)),
-        "precision": float(precision_score(labels, predictions, zero_division=0)),
-        "recall": float(recall_score(labels, predictions, zero_division=0)),
-        "f1": float(f1_score(labels, predictions, zero_division=0)),
-        "threshold": threshold,
-    }
-
-
-def run(root: Path) -> None:
-    """训练 LR 并在后续日期评价，输出指标及标准化系数。
-
-    Args:
-        root: 项目目录，需先运行清洗流水线。
-    """
-    with duckdb.connect(str(root / "data/work.duckdb"), read_only=True) as connection:
-        cutoffs = [
-            datetime.fromisoformat(day)
-            for day in ["2025-11-25", "2025-12-02", "2025-12-09"]
-        ]
-        samples = [build_samples(connection, cutoff) for cutoff in cutoffs]
-        coverage = []
-        for cutoff, frame in zip(cutoffs, samples):
-            future_pairs = connection.execute(
-                """SELECT count(*) FROM (
-                SELECT DISTINCT user_id,item_id FROM events
-                WHERE event_time>=? AND event_time<? AND behavior_type=4)""",
-                [cutoff, cutoff + timedelta(days=7)],
-            ).fetchall()[0][0]
-            coverage.append(
-                {
-                    "cutoff": cutoff.isoformat(),
-                    "future_purchased_pairs": future_pairs,
-                    "covered_purchased_pairs": int(frame["label"].sum()),
-                    "coverage": float(frame["label"].sum() / future_pairs),
-                }
-            )
-    train, validation, test = samples
-    for frame in samples:
-        if frame["label"].nunique() != 2:
-            raise ValueError("训练或评价集只有一种标签，不能进行二分类评价")
-    classifier = LogisticRegression(
-        class_weight="balanced", max_iter=500, random_state=42
-    )
-    model = make_pipeline(StandardScaler(), classifier)
-    model.fit(np.log1p(train[FEATURES]), train["label"])
-    validation_scores = model.predict_proba(np.log1p(validation[FEATURES]))[:, 1]
-    precision, recall, thresholds = precision_recall_curve(
-        validation["label"], validation_scores
-    )
-    f1_values = (
-        2
-        * precision[:-1]
-        * recall[:-1]
-        / np.maximum(precision[:-1] + recall[:-1], 1e-12)
-    )
-    threshold = float(thresholds[int(np.argmax(f1_values))])
-    scores = model.predict_proba(np.log1p(test[FEATURES]))[:, 1]
-    results = {
-        "task": "historically interacted user-item pairs; next 7 days purchase",
-        "cutoffs": ["2025-11-25", "2025-12-02", "2025-12-09"],
-        "train_rows": len(train),
-        "train_positive_rate": float(train["label"].mean()),
-        "candidate_coverage": coverage,
-        "validation": evaluate(validation["label"], validation_scores, threshold),
-        "test": evaluate(test["label"], scores, threshold),
-    }
-    (root / "reports/lr_metrics.json").write_text(
-        json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-    pd.DataFrame({"feature": FEATURES, "coefficient": classifier.coef_[0]}).to_csv(
-        root / "reports/lr_coefficients.csv", index=False
-    )
-
-
-def main() -> None:
-    """解析项目目录并执行基线。"""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path.cwd())
-    run(parser.parse_args().root)
 
 
 if __name__ == "__main__":

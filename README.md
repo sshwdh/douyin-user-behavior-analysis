@@ -10,7 +10,7 @@
 
 行为码语义、时区、采样与采集完整性仍待确认；有记录覆盖全部 744 小时不等于证明完整采集。11/13 去重结果与 11/15 跨商品暂行结果仅供历史追溯，不作为当前分析依据。
 
-## 第二周进展：窗口特征与样本准备
+## 第二周进展：窗口特征与 LR 对照
 
 已在确认的全量保留数据上完成 **24 项窗口特征**、三个时间窗口样本、候选覆盖与防泄漏测试。详见[样本核验报告](docs/10_窗口特征与样本核验.md)及[特征字典](docs/03_特征字典.md)。测试窗口候选覆盖未来行为码 4 用户商品对的 16.39%，不能将后续候选内模型指标解释为全站推荐效果。
 
@@ -18,7 +18,7 @@
 .venv/bin/python -m douyin_analysis.feature_audit --snapshot reports/audits/2026-11-17/data_snapshot.json
 ```
 
-样本明细留本地；公开汇总及两张图见 `reports/features/`。本轮只完成技术样本准备，行为语义仍待确认，未训练新模型。
+样本明细留本地；公开汇总及两张图见 `reports/features/`。已完成固定样本上的 LR 10/24 项特征对照，详见[实验报告与结果图](reports/lr_baseline_report.md)。24 项特征的测试 AP 仅略升，Recall 与 F1 下降，不能宣称明显改善；行为语义仍待确认。
 
 ## 第一周交付
 
@@ -30,7 +30,7 @@
 
 已完成：全量数据校验、保留重复交互与小时频次筛查、Parquet 导出、SQLite 结构化存储、八类探索图表、质量检查及三篇文献调研。
 
-旧口径的[逻辑回归基线已失效](reports/lr_baseline_report.md)，新口径尚未重跑。已实现 24 项基础窗口特征；完整特征体系、树模型、深度模型与最终演示尚未完成，按[项目计划](docs/01_项目执行计划.md)推进。
+旧去重口径的逻辑回归指标已失效；[当前 LR 对照](reports/lr_baseline_report.md)已在全量保留版本上完成。已实现 24 项基础窗口特征；完整特征体系、树模型、深度模型与最终演示尚未完成，按[项目计划](docs/01_项目执行计划.md)推进。
 
 ## 数据与指标边界
 
@@ -58,10 +58,11 @@ python3.12 -m venv .venv
 
 `requirements-lock.txt` 记录首批结果生成环境；`pyproject.toml` 声明直接依赖。清洗命令会重建指定项目目录中的工作表和派生文件，SQLite 命令会重建本地分析数据库。原始 CSV 只读。
 
-可选基线运行：
+固定窗口 LR 对照与报告：
 
 ```bash
-.venv/bin/python -m douyin_analysis.modeling
+.venv/bin/python -m douyin_analysis.lr_experiment
+.venv/bin/python -m douyin_analysis.experiment_report
 ```
 
 该基线采用七日历史与七日标签窗，验证集选阈值后固定在测试集评估。运行结果及候选覆盖限制见基线报告；并非线上验证结果。
