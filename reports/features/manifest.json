@@ -1,0 +1,66 @@
+{
+  "created_at_utc": "2026-11-17T11:43:57.011835+00:00",
+  "data_snapshot_id": "provisional-2cacdd7b8760d553",
+  "events_sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+  "source_sha256": "64c1436d3f984f813c12c730950d61cdc1892e8dbbb54e102911b182c2690072",
+  "semantic_confirmations": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  },
+  "status": "technical_samples_only_semantics_pending",
+  "label_definition": "observed behavior_type=4 in [cutoff,cutoff+7d)",
+  "candidate_definition": "interacted pair in [cutoff-7d,cutoff)",
+  "features": [
+    "pair_events",
+    "pair_pv",
+    "pair_fav",
+    "pair_cart",
+    "pair_buy",
+    "pair_recency_hours",
+    "user_events",
+    "user_buy",
+    "item_events",
+    "item_buy",
+    "pair_active_days",
+    "pair_distinct_hours",
+    "user_pv",
+    "user_fav",
+    "user_cart",
+    "user_distinct_items",
+    "user_active_days",
+    "user_recency_hours",
+    "user_buy_recency_hours",
+    "user_has_buy",
+    "item_users",
+    "item_buyers",
+    "item_active_days",
+    "item_buyer_rate"
+  ],
+  "cutoffs": [
+    "2025-11-25",
+    "2025-12-02",
+    "2025-12-09"
+  ],
+  "artifacts": {
+    "train": {
+      "sha256": "7057e956c15bd6f2956aeefa45aae2d14e36f5cc3a0305a24150d7d001da89e9",
+      "rows": 1030893
+    },
+    "validation": {
+      "sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+      "rows": 1061515
+    },
+    "test": {
+      "sha256": "ffae14b55d463ecceddd4afecca0990bfe5efcb2d609fc3d1ec2466c5a63728c",
+      "rows": 1117324
+    }
+  },
+  "code_sha256": {
+    "features.py": "5a08163d29bafd01ff60a442d1ffe11ce1e46aa55215338c2beeb91bbc2b2ef7",
+    "feature_audit.py": "7db6dc1e3eae1c7b87e15e70ff77764a2a984630a747347ffa7fd434569e079f"
+  },
+  "model_trained": false
+}

@@ -21,18 +21,9 @@ from sklearn.metrics import (
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-FEATURES = [
-    "pair_events",
-    "pair_pv",
-    "pair_fav",
-    "pair_cart",
-    "pair_buy",
-    "pair_recency_hours",
-    "user_events",
-    "user_buy",
-    "item_events",
-    "item_buy",
-]
+from douyin_analysis.features import BASELINE_FEATURES
+
+FEATURES = BASELINE_FEATURES
 
 
 def build_samples(
