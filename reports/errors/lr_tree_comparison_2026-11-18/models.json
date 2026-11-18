@@ -1,0 +1,17 @@
+{
+  "thresholds": {
+    "lr_24": 0.9486747408530701,
+    "hgb_31": 0.9371093235066793
+  },
+  "fingerprints": {
+    "lr_24": {
+      "model": "55e8dbb9a2b855f719356db54ddfab33c9b0754ae3de0e548efa3084e1cdad3c",
+      "metrics": "d8ea1bbdcc1e546ab30d6f426a7840f263426cc565aa8b6a68f14fb1e625807c"
+    },
+    "hgb_31": {
+      "model": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b",
+      "metrics": "f80382c55a7f5f54014be6b79d2478a24ef9a0deb50ce597e2cdce45176946e1"
+    }
+  },
+  "metrics_reproduced": true
+}

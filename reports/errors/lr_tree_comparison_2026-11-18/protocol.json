@@ -1,0 +1,13 @@
+{
+  "budgets": [
+    5060,
+    12400
+  ],
+  "budget_reason": "previous fixed predicted-positive counts: tree 5060, LR 12400",
+  "tie_break": "stable validation row order (user_id, item_id)",
+  "code_sha256": "6af1c1e66761867a096426b7484866a5b12fa03d626d6682245c660621c68fb1",
+  "validation_sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+  "test_accessed": false,
+  "retrained": false,
+  "status": "development_diagnostics_not_independent_evaluation"
+}
