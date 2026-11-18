@@ -1,0 +1,86 @@
+{
+  "features": [
+    "pair_events",
+    "pair_pv",
+    "pair_fav",
+    "pair_cart",
+    "pair_buy",
+    "pair_recency_hours",
+    "user_events",
+    "user_buy",
+    "item_events",
+    "item_buy",
+    "pair_active_days",
+    "pair_distinct_hours",
+    "user_pv",
+    "user_fav",
+    "user_cart",
+    "user_distinct_items",
+    "user_active_days",
+    "user_recency_hours",
+    "user_buy_recency_hours",
+    "user_has_buy",
+    "item_users",
+    "item_buyers",
+    "item_active_days",
+    "item_buyer_rate",
+    "pair_events_last24h",
+    "pair_events_24to72h",
+    "pair_behavior_types",
+    "pair_span_hours",
+    "pair_user_event_share",
+    "pair_item_event_share"
+  ],
+  "parameters": {
+    "categorical_features": "from_dtype",
+    "class_weight": "balanced",
+    "early_stopping": false,
+    "interaction_cst": null,
+    "l2_regularization": 1.0,
+    "learning_rate": 0.05,
+    "loss": "log_loss",
+    "max_bins": 255,
+    "max_depth": null,
+    "max_features": 1.0,
+    "max_iter": 150,
+    "max_leaf_nodes": 31,
+    "min_samples_leaf": 50,
+    "monotonic_cst": null,
+    "n_iter_no_change": 10,
+    "random_state": 42,
+    "scoring": "loss",
+    "tol": 1e-07,
+    "validation_fraction": 0.1,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "budgets": [
+    5060,
+    12400
+  ],
+  "test_accessed": false,
+  "samples": {
+    "train": {
+      "sha256": "7057e956c15bd6f2956aeefa45aae2d14e36f5cc3a0305a24150d7d001da89e9",
+      "rows": 1030893
+    },
+    "validation": {
+      "sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+      "rows": 1061515
+    }
+  },
+  "events_sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+  "semantics": {
+    "frequency_scope": "confirmed",
+    "whole_group_quarantine": "pending",
+    "behavior_code_meanings": "pending",
+    "timezone": "pending",
+    "sampling_and_collection": "pending"
+  },
+  "code_sha256": {
+    "extra_features.py": "c403b3227acc95cc88629aa4c4c5357910e0b8754cda3bef03646e3c61db0c91",
+    "feature_ablation.py": "918050e8bae7497fb8787e238a01b00f249fbbd737f953fa4040e1c1034448c9"
+  },
+  "selection": "Report AP and fixed-budget subgroup hits; no automatic replacement",
+  "threshold": "New variant validation maximum F1, ties prefer higher; development only"
+}

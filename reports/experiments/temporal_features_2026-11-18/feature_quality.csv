@@ -1,0 +1,13 @@
+split,feature,minimum,maximum,missing
+train,pair_events_last24h,0.0,22.0,0
+train,pair_events_24to72h,0.0,30.0,0
+train,pair_behavior_types,1.0,4.0,0
+train,pair_span_hours,0.0,167.0,0
+train,pair_user_event_share,0.00014349261013057828,1.0,0
+train,pair_item_event_share,0.0021551724137931034,1.0,0
+validation,pair_events_last24h,0.0,37.0,0
+validation,pair_events_24to72h,0.0,28.0,0
+validation,pair_behavior_types,1.0,4.0,0
+validation,pair_span_hours,0.0,167.0,0
+validation,pair_user_event_share,0.00013094146916328402,1.0,0
+validation,pair_item_event_share,0.0026041666666666665,1.0,0

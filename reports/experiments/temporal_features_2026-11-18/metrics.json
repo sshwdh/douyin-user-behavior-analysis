@@ -1,0 +1,41 @@
+{
+  "status": "exploratory_validation_only",
+  "models": {
+    "baseline24": {
+      "rows": 1061515,
+      "positives": 2525,
+      "positive_rate": 0.002378675760587462,
+      "roc_auc": 0.881827213656502,
+      "pr_auc_average_precision": 0.03932840231904845,
+      "accuracy": 0.993546016777907,
+      "precision": 0.0725296442687747,
+      "recall": 0.14534653465346534,
+      "f1": 0.09676994067237969,
+      "threshold": 0.9371093235066793,
+      "predicted_positive": 5060,
+      "true_positive": 367,
+      "false_positive": 4693,
+      "false_negative": 2158
+    },
+    "extended30": {
+      "rows": 1061515,
+      "positives": 2525,
+      "positive_rate": 0.002378675760587462,
+      "roc_auc": 0.8845650547471955,
+      "pr_auc_average_precision": 0.04318525042553173,
+      "accuracy": 0.9939944324856456,
+      "precision": 0.0798777826276735,
+      "recall": 0.14495049504950494,
+      "f1": 0.10299704516673702,
+      "threshold": 0.9400346876713576,
+      "predicted_positive": 4582,
+      "true_positive": 366,
+      "false_positive": 4216,
+      "false_negative": 2159
+    }
+  },
+  "baseline_model_sha256": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b",
+  "extended_model_sha256": "708419656d166a25dbf46d7cc509c5b6ef46346fbb676b0f1ef3afef1895bbe9",
+  "test_accessed": false,
+  "business_threshold_decided": false
+}
