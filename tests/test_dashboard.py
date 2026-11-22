@@ -60,12 +60,12 @@ def test_behavior_page_and_filters() -> None:
     assert not app.error
     assert app.metric[0].value == "12,256,906"
     app.date_input[0].set_value((date(2025, 11, 18), date(2025, 11, 18)))
-    app.selectbox[0].select("日活跃用户数")
+    app.selectbox[0].select("全部行为")
     app.selectbox[1].select("类别")
     app.run()
     assert not app.exception
     assert not app.error
-    assert any("366,701" in item.value for item in app.caption)
+    assert app.metric[4].value == "366,701"
     assert len(app.dataframe[-1].value) == 3
 
 

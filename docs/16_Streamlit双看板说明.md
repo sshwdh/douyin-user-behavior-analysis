@@ -1,21 +1,23 @@
 # Streamlit 双看板说明
 
-更新：2026-11-22。首版已接入既有公开结果，不训练模型、不读取原始用户明细。参考《双看板大纲》分阶段实施。
+更新：2026-11-22。第二版已接入可联动的公开聚合及既有模型结果，不训练模型、不读取原始用户明细。参考《双看板大纲》分阶段实施。
 
 ## 启动
 
 在仓库根目录的 Python 3.12 环境安装 `python -m pip install -e '.[dashboard]'`，运行 `python -m streamlit run scripts/run_dashboard.py --server.address 127.0.0.1 --browser.gatherUsageStats false`，浏览器打开终端提供的本机地址。需保留仓库内 reports 和 outputs；单独复制入口脚本不能运行。Streamlit 版本固定为 1.67.0。`requirements-dashboard-lock.txt` 保存此次运行环境；首批分析环境锁文件保持不变。中文路径在 ASCII 区域设置下，安装与启动命令前加 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8`。
 
-首版只加载小型公开汇总；每次交互重新读取，避免缓存过期。目前不支持任意类别、日期下重算全量去重人数，也不提供用户级明细。
+第二版加载不足1 MB的压缩聚合，按文件指纹和修改时间缓存；不提供用户级明细。日期与行为联动影响每日事件、星期小时热力图、日去重用户和类目分析。全期概况及全期用户频次分布明确标注范围。
 
 ## 指标与筛选范围
 
-| 展示 | 来源 | 分母与边界 | 首版交互 |
+| 展示 | 来源 | 分母与边界 | 当前交互 |
 |---|---|---|---|
 | 事件、用户、商品、类目 | reports/quality.json | 全观察期；实体去重；重复事件保留 | 固定全期 |
-| 每日事件、日活跃、日行为码4用户 | reports/daily.csv | 每日独立去重；不可累加用户数作为区间人数 | 日期、指标切换，仅影响每日趋势 |
-| 小时分布 | reports/hourly.csv | 所有日期按一天中小时合并；非精确会话 | 固定全期 |
-| 类目排行 | reports/categories.csv | 按事件数排序；非曝光排行 | 展示前5至30项，不受日期筛选影响 |
+| 每日事件趋势 | dashboard/aggregates/hourly_behavior.csv.gz | 事件次数可加，正常重复保留 | 日期＋行为联动 |
+| 星期×小时热力图 | 同上 | 该星期该小时总事件÷所选区间该星期天数；未包含的星期留空 | 日期＋行为联动 |
+| 每日交互用户 | dashboard/aggregates/daily_users.csv.gz | 每日按行为独立去重；全行为单独去重，不累加四码人数 | 日期＋行为联动 |
+| 类目排行及长尾 | dashboard/aggregates/daily_categories.csv.gz | 按事件数排序，累计占比基于完整类目集合；非曝光排行 | 日期＋行为联动、前5至30项、CSV下载 |
+| 用户频次分布 | dashboard/aggregates/user_activity.csv.gz | 全观察期同一用户的事件次数分桶；零次用户不纳入 | 仅随行为选择变化，日期不影响 |
 | 特征目录 | reports/features/feature_catalog.csv | 24基础、6实验；3类目建议未实现 | 按层级筛选、Excel下载 |
 | 样本正例率 | reports/features/sample_summary.csv | 正标签候选对 / 全部候选对 | 固定验证窗 |
 | 候选覆盖率 | 同上 | 候选中未来码4对 / 未来全部码4对 | 固定验证窗 |
@@ -29,14 +31,20 @@
 
 ## 数据一致性
 
-入口核对 daily、hourly、behavior 三张汇总事件总数是否等于 quality 的保留行数。模型加载核对 TP+FN=正例、TP+FP=预测正例、TN非负及各模型验证样本数一致；错误时提示停止展示对应结果。这些是首版一致性检查，不能替代完整数据版本校验。
+入口核对 daily、hourly、behavior 三张汇总事件总数是否等于 quality 的保留行数。模型加载核对 TP+FN=正例、TP+FP=预测正例、TN非负及各模型验证样本数一致；错误时提示停止展示对应结果。新聚合生成前核验事件 Parquet 与11/17快照SHA256一致，导出后记录每表指纹；加载时核对质量报告与聚合文件指纹。逐日逐行为对账小时与类目总数，逐日用户数与已有DAU/码4用户报告核对。
 
 ## 后续范围
 
-1. 生成可按日期、行为和类目查询的聚合数据，补充星期×小时热力图、用户活跃分布、商品排行与长尾分布。
+1. 进一步补充商品排行、类目细分钻取。当前已有日期＋行为联动；尚无类目筛选联动全部图表。
 2. 增加交互式 PR/ROC 和误报漏报分组，注明阈值与候选覆盖的限制。每用户 Top-K 需新定义，不能复用现有全局预算冒充。
 3. 核验后整理截图、周报及演示说明。SHAP、校准、真正冷启动评估尚未实现，不生成占位结果。
 
 缺少曝光、金额、订单、会话及退出字段，不展示曝光CTR、GMV、实际停留时长或退出率。小时内并列事件不能还原准确顺序；收藏、加购不是强制串联漏斗。
 
 技术参考：[Streamlit 页面导航](https://docs.streamlit.io/develop/api-reference/navigation/st.navigation)、[AppTest](https://docs.streamlit.io/develop/api-reference/app-testing/st.testing.v1.apptest)。
+
+## 重建公开聚合
+
+本地已有授权事件数据时运行 `python -m douyin_analysis.dashboard_export`。仅展示时不运行此命令。产物位于 `reports/dashboard/aggregates/`，包含版本清单及四张聚合表，不含用户ID、商品ID或单条事件记录。
+
+在线交付配置与尚待完成事项见[部署清单](17_在线部署与交付清单.md)。

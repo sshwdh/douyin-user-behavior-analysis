@@ -1,0 +1,32 @@
+{
+  "generated_at_utc": "2026-11-22T15:41:46.600263+00:00",
+  "snapshot_id": "provisional-2cacdd7b8760d553",
+  "source_sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+  "quality_sha256": "ff5eb8a46b2e9333d4d10d0a6b1094bd27822a688b4601d97e70ec6b60797aca",
+  "events": 12256906,
+  "users": 10000,
+  "start": "2025-11-18 00:00:00",
+  "end": "2025-12-18 23:00:00",
+  "files": {
+    "hourly_behavior": {
+      "sha256": "d5d13fc8991ce349af7a9306602ef1b3945e36c4d5bcb50b593d63e7f7ce3888",
+      "rows": 2976,
+      "bytes": 13143
+    },
+    "daily_categories": {
+      "sha256": "b7aa49aff3f125f0bbfb05b970f61077e68a7556937ec5f253259584e6d2004d",
+      "rows": 260401,
+      "bytes": 881762
+    },
+    "user_activity": {
+      "sha256": "7b3a051e0fa50ff5feaa75bde1c31e6f0db5ad8f3140d0e3376e82821511b5ea",
+      "rows": 31,
+      "bytes": 390
+    },
+    "daily_users": {
+      "sha256": "eea50b1394816ce23ee4b957cd5217df367191bf12ab5dff3596f1b4711e30f2",
+      "rows": 155,
+      "bytes": 742
+    }
+  }
+}

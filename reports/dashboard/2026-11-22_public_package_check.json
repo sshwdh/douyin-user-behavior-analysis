@@ -1,0 +1,11 @@
+{
+  "verified_at_utc": "2026-11-22T15:43:29.655534+00:00",
+  "scope": "staged Git files only, local installed dependencies; no raw data or models",
+  "raw_data_present": false,
+  "behavior_page": "passed",
+  "behavior_filter_code4_events": 120205,
+  "model_page": "passed",
+  "first_run_seconds": 0.457,
+  "filter_rerun_seconds": 0.13,
+  "online_deployment_verified": false
+}

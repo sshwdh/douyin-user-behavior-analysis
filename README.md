@@ -122,7 +122,7 @@ python3.12 -m venv .venv
 
 ## 第三周提前启动：Streamlit 双看板
 
-2026-11-22 已完成首版：用户行为与特征页面、模型验证与误差页面。仅使用仓库中的公开汇总结果，不需要原始 CSV 即可查看。后续联动筛选、热力图、完整交互曲线仍在开发计划中。
+2026-11-22 已完成首版：用户行为与特征页面、模型验证与误差页面。仅使用仓库中的公开汇总结果，不需要原始 CSV 即可查看。第二版已增加日期＋行为联动、星期小时热力图、每日去重用户、类目长尾和用户频次分布；完整交互模型曲线仍待开发。
 
 - [特征汇总 Excel（实现核对版）](outputs/2026-11-22/特征拆分整理_实现核对版.xlsx)
 - [特征汇总 CSV（GitHub 可直接预览）](reports/features/feature_catalog.csv)
@@ -137,3 +137,5 @@ python -m streamlit run scripts/run_dashboard.py --server.address 127.0.0.1 --br
 ```
 
 中文路径若遇到安装编码错误，使用 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` 运行安装和启动命令。当前服务仅供本机查看；GitHub 链接是代码和产物入口，不是在线托管看板。
+
+在线交付采用 Streamlit Community Cloud，配置见[部署与交付清单](docs/17_在线部署与交付清单.md)。根目录 requirements.txt 已准备；目前尚未获得经过访问验证的公网看板地址。

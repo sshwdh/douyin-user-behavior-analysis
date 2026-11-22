@@ -3,13 +3,12 @@
 import pandas as pd
 import streamlit as st
 
+from douyin_analysis.dashboard_behavior import render_behavior
 from douyin_analysis.dashboard_data import (
     REPORTS,
     ROOT,
     model_metrics,
-    overview,
     read_report,
-    select_days,
 )
 
 
@@ -28,70 +27,8 @@ def show_features() -> None:
 
 
 def behavior_page() -> None:
-    """展示全观察期概况与独立的每日趋势日期筛选。"""
-    st.title("用户行为与特征")
-    quality = overview()
-    st.caption(f"全观察期：{quality['start']} 至 {quality['end']}，原始时间未转换时区")
-    columns = st.columns(4)
-    for column, label, key in zip(
-        columns,
-        ["有效事件", "用户", "商品", "类目"],
-        ["clean_rows", "users", "items", "categories"],
-    ):
-        column.metric(label, f"{int(quality[key]):,}")
-    st.caption("小时内正常重复行为全部保留。以上为全观察期去重实体数。")
-    st.subheader("每日趋势")
-    daily = read_report("daily.csv")
-    dates = pd.to_datetime(daily.day).dt.date
-    selected = st.date_input(
-        "趋势日期范围（仅影响本节）",
-        value=(dates.min(), dates.max()),
-        min_value=dates.min(),
-        max_value=dates.max(),
-    )
-    if isinstance(selected, tuple) and len(selected) == 2:
-        filtered = select_days(daily, selected[0], selected[1])
-        if filtered.empty:
-            st.info("所选日期没有记录。")
-        else:
-            metric = st.selectbox(
-                "趋势指标", ["事件数", "日活跃用户数", "日行为码 4 用户数"]
-            )
-            if metric is None:
-                return
-            mapping = {
-                "事件数": "events",
-                "日活跃用户数": "dau",
-                "日行为码 4 用户数": "buyers",
-            }
-            plot = filtered.rename(columns={"day": "日期", mapping[metric]: metric})
-            st.line_chart(plot.set_index("日期")[[metric]])
-            st.caption(
-                f"所选范围事件合计：{int(filtered.events.sum()):,}；日用户数不可相加作为区间去重人数。"
-            )
-    else:
-        st.info("请选择完整的开始与结束日期。")
-    st.subheader("全观察期小时分布")
-    hourly = read_report("hourly.csv").rename(
-        columns={"hour": "小时", "events": "事件数"}
-    )
-    st.bar_chart(hourly.set_index("小时")[["事件数"]])
-    st.caption("按一天中的小时汇总全部观察日；不受上方日期筛选影响。")
-    st.subheader("全观察期类目交互排行")
-    count = st.slider("展示类目数量", 5, 30, 20)
-    categories = read_report("categories.csv").nlargest(count, "events")
-    categories["category_id"] = categories.category_id.astype(str)
-    st.dataframe(
-        categories.rename(
-            columns={
-                "category_id": "类目编号",
-                "events": "事件数",
-                "users": "交互用户数",
-                "buyers": "行为码 4 用户数",
-            }
-        ),
-        hide_index=True,
-    )
+    """展示联动行为分析及独立的特征实现清单。"""
+    render_behavior()
     show_features()
 
 
@@ -153,7 +90,7 @@ def main() -> None:
     """配置双页面导航及共用口径说明。"""
     st.set_page_config(page_title="抖音商城用户行为分析", layout="wide")
     st.sidebar.title("抖音商城分析")
-    st.sidebar.caption("第一版 · 2026-11-22\n基于已保存的分析结果")
+    st.sidebar.caption("第二版 · 2026-11-22\n基于已保存的分析结果")
     st.sidebar.info("行为码释义、时区与采样完整性待确认；当前仅作离线分析。")
     page = st.navigation(
         [
