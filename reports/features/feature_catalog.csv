@@ -1,0 +1,34 @@
+所在表,特征名,特征,计算方法,特征描述,代码字段,时间窗口,实现状态,来源
+用户,user_bev_count,总交互数,count(*),保留正常重复交互，按用户分组,user_events,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_buy,行为码 4 次数,count(*) FILTER (WHERE behavior_type=4),保留正常重复交互，按用户分组,user_buy,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_pre_count,行为码 1 次数,count(*) FILTER (WHERE behavior_type=1),保留正常重复交互，按用户分组,user_pv,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_fav,行为码 2 次数,count(*) FILTER (WHERE behavior_type=2),保留正常重复交互，按用户分组,user_fav,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_cart,行为码 3 次数,count(*) FILTER (WHERE behavior_type=3),保留正常重复交互，按用户分组,user_cart,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_distinct_items,交互商品数,count(DISTINCT item_id),保留正常重复交互，按用户分组,user_distinct_items,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_active_days,活跃自然日数,count(DISTINCT CAST(event_time AS DATE)),保留正常重复交互，按用户分组,user_active_days,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_recency_hours,距最近交互小时数,"date_diff('hour', max(event_time), cutoff)",保留正常重复交互，按用户分组,user_recency_hours,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_buy_recency_hours,距最近行为码 4 小时数,"coalesce(date_diff('hour', max(event_time) FILTER (WHERE behavior_type=4), cutoff),168)",无行为码 4 时填168；结合 user_has_buy 区分边界,user_buy_recency_hours,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户,user_has_buy,是否有行为码 4,int(count(code4)>0),保留正常重复交互，按用户分组,user_has_buy,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_events,总交互数,count(*),保留正常重复交互，按商品分组,item_events,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_buy,行为码 4 次数,count(*) FILTER (WHERE behavior_type=4),保留正常重复交互，按商品分组,item_buy,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_users,交互用户数,count(DISTINCT user_id),保留正常重复交互，按商品分组,item_users,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_buyers,行为码 4 用户数,count(DISTINCT user_id) FILTER (WHERE behavior_type=4),保留正常重复交互，按商品分组,item_buyers,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_active_days,活跃自然日数,count(DISTINCT CAST(event_time AS DATE)),保留正常重复交互，按商品分组,item_active_days,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+商品,item_buyer_rate,行为码 4 用户占比,item_buyers / item_users,候选内分母>0；不是曝光转化率,item_buyer_rate,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+类别,category_events,类目交互数,count(*) GROUP BY category_id,建议项；全观察期EDA已有汇总，七日预测特征未实现,未实现,"[cutoff−7天, cutoff)",待实现：预测特征,docs/03_特征字典.md
+类别,category_users,类目交互用户数,count(DISTINCT user_id) GROUP BY category_id,建议项；全观察期EDA已有汇总，七日预测特征未实现,未实现,"[cutoff−7天, cutoff)",待实现：预测特征,docs/03_特征字典.md
+类别,category_code4_users,类目行为码4用户数,count(DISTINCT user_id) FILTER (WHERE behavior_type=4),建议项；全观察期EDA已有汇总，七日预测特征未实现,未实现,"[cutoff−7天, cutoff)",待实现：预测特征,docs/03_特征字典.md
+用户商品交互,pair_events,总交互数,count(*),保留正常重复交互，按用户商品交互分组,pair_events,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_pv,行为码 1 次数,count(*) FILTER (WHERE behavior_type=1),保留正常重复交互，按用户商品交互分组,pair_pv,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_fav,行为码 2 次数,count(*) FILTER (WHERE behavior_type=2),保留正常重复交互，按用户商品交互分组,pair_fav,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_cart,行为码 3 次数,count(*) FILTER (WHERE behavior_type=3),保留正常重复交互，按用户商品交互分组,pair_cart,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_buy,行为码 4 次数,count(*) FILTER (WHERE behavior_type=4),保留正常重复交互，按用户商品交互分组,pair_buy,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_recency_hours,距最近交互小时数,"date_diff('hour', max(event_time), cutoff)",保留正常重复交互，按用户商品交互分组,pair_recency_hours,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_active_days,活跃自然日数,count(DISTINCT CAST(event_time AS DATE)),保留正常重复交互，按用户商品交互分组,pair_active_days,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_distinct_hours,有交互小时桶数,count(DISTINCT event_time),保留正常重复交互，按用户商品交互分组,pair_distinct_hours,"[cutoff−7天, cutoff)",已实现：24项基础,src/douyin_analysis/features.py
+用户商品交互,pair_events_last24h,近24小时交互数,count(*),已完成固定树模型对照；未替代24项基线,pair_events_last24h,"[cutoff−24小时, cutoff)",已实现：6项实验,src/douyin_analysis/extra_features.py
+用户商品交互,pair_events_24to72h,前24至72小时交互数,count(*),已完成固定树模型对照；未替代24项基线,pair_events_24to72h,"[cutoff−72小时, cutoff−24小时)",已实现：6项实验,src/douyin_analysis/extra_features.py
+用户商品交互,pair_behavior_types,行为类型数,count(DISTINCT behavior_type),已完成固定树模型对照；未替代24项基线,pair_behavior_types,"[cutoff−7天, cutoff)",已实现：6项实验,src/douyin_analysis/extra_features.py
+用户商品交互,pair_span_hours,首末交互跨度小时,"date_diff('hour', min(event_time), max(event_time))",已完成固定树模型对照；未替代24项基线,pair_span_hours,"[cutoff−7天, cutoff)",已实现：6项实验,src/douyin_analysis/extra_features.py
+用户商品交互,pair_user_event_share,占用户交互比例,pair_events / user_events,已完成固定树模型对照；未替代24项基线,pair_user_event_share,"[cutoff−7天, cutoff)",已实现：6项实验,src/douyin_analysis/extra_features.py
+用户商品交互,pair_item_event_share,占商品交互比例,pair_events / item_events,已完成固定树模型对照；未替代24项基线,pair_item_event_share,"[cutoff−7天, cutoff)",已实现：6项实验,src/douyin_analysis/extra_features.py

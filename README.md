@@ -30,7 +30,7 @@
 
 已完成：全量数据校验、保留重复交互与小时频次筛查、Parquet 导出、SQLite 结构化存储、八类探索图表、质量检查及三篇文献调研。
 
-旧去重口径的逻辑回归指标已失效；[当前 LR 对照](reports/lr_baseline_report.md)已在全量保留版本上完成。已实现 24 项基础窗口特征；完整特征体系、树模型、深度模型与最终演示尚未完成，按[项目计划](docs/01_项目执行计划.md)推进。
+旧去重口径的逻辑回归指标已失效；[当前 LR 对照](reports/lr_baseline_report.md)已在全量保留版本上完成。已实现 24 项基础窗口特征；完整特征体系、深度模型与最终演示尚未完成；固定树模型验证对照已完成，按[项目计划](docs/01_项目执行计划.md)推进。
 
 ## 数据与指标边界
 
@@ -47,7 +47,7 @@
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
-.venv/bin/python -m pip install -e '.[dev,reports]'
+.venv/bin/python -m pip install -e '.[dev,reports,dashboard]'
 .venv/bin/python -m douyin_analysis.pipeline --input ../user_behavior.csv --threshold 100 --scope user_item_behavior_hour
 .venv/bin/python scripts/analyze_hourly_frequency.py
 .venv/bin/python -m douyin_analysis.sqlite_store
@@ -119,3 +119,21 @@ python3.12 -m venv .venv
 ### 第二周提交材料（2026-11-20）
 
 [第二周项目周报 PDF（12 页、11 张图）](output/pdf/2026-11-20_第二周项目汇报.pdf)：汇总 11/14 至 11/20 阶段工作，包含清洗口径修正、验证实验、局限、待确认问题与下周计划。分析结果截至 11/18，11/20 整理提交。
+
+## 第三周提前启动：Streamlit 双看板
+
+2026-11-22 已完成首版：用户行为与特征页面、模型验证与误差页面。仅使用仓库中的公开汇总结果，不需要原始 CSV 即可查看。后续联动筛选、热力图、完整交互曲线仍在开发计划中。
+
+- [特征汇总 Excel（实现核对版）](outputs/2026-11-22/特征拆分整理_实现核对版.xlsx)
+- [特征汇总 CSV（GitHub 可直接预览）](reports/features/feature_catalog.csv)
+- [看板指标口径与使用说明](docs/16_Streamlit双看板说明.md)
+- [11/22 实际工作记录](docs/daily/2026-11-22_Streamlit双看板启动.md)
+
+在仓库根目录、已激活的 Python 3.12 环境中运行：
+
+```bash
+python -m pip install -e '.[dashboard]'
+python -m streamlit run scripts/run_dashboard.py --server.address 127.0.0.1 --browser.gatherUsageStats false
+```
+
+中文路径若遇到安装编码错误，使用 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` 运行安装和启动命令。当前服务仅供本机查看；GitHub 链接是代码和产物入口，不是在线托管看板。
