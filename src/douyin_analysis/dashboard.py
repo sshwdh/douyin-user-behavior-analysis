@@ -11,6 +11,7 @@ from douyin_analysis.dashboard_data import (
     read_report,
 )
 from douyin_analysis.dashboard_errors import show_budget_comparison, show_error_groups
+from douyin_analysis.dashboard_visuals import apply_style, show_precision_recall
 
 
 def show_features() -> None:
@@ -59,6 +60,7 @@ def model_page() -> None:
     st.subheader("同一验证集上的模型比较")
     st.dataframe(metrics[list(labels)].rename(columns=labels))
     st.bar_chart(metrics[["pr_auc_average_precision"]].rename(columns=labels))
+    show_precision_recall(metrics)
     name = st.selectbox("查看模型", list(metrics.index), index=3)
     row = metrics.loc[name]
     st.caption(f"既有验证集选出的 F1 阈值：{row.threshold:.6f}；尚非业务阈值。")
@@ -87,8 +89,9 @@ def model_page() -> None:
 def main() -> None:
     """配置双页面导航及共用口径说明。"""
     st.set_page_config(page_title="抖音商城用户行为分析", layout="wide")
+    apply_style()
     st.sidebar.title("抖音商城分析")
-    st.sidebar.caption("第三版 · 2026-11-23\n基于已保存的分析结果")
+    st.sidebar.caption("第四版 · 2026-11-23\n基于已保存的分析结果")
     st.sidebar.info("行为码释义、时区与采样完整性待确认；当前仅作离线分析。")
     page = st.navigation(
         [

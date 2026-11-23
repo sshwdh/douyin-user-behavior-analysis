@@ -13,6 +13,7 @@ from douyin_analysis.dashboard_aggregates import (
     weekday_heatmap,
 )
 from douyin_analysis.dashboard_data import overview
+from douyin_analysis.dashboard_visuals import show_behavior_mix, show_hour_profile
 
 BEHAVIORS = {
     "全部行为": 0,
@@ -193,7 +194,11 @@ def render_behavior() -> None:
     if hours.empty:
         st.info("该范围未观察到所选行为，不生成转化率。")
     else:
+        show_behavior_mix(
+            filter_events(load_aggregate("hourly_behavior"), *selected, 0)
+        )
         show_time_patterns(hours, *selected)
+        show_hour_profile(hours, (selected[1] - selected[0]).days + 1)
         show_daily_users(*selected, behavior)
         show_categories(categories)
     show_activity(behavior)

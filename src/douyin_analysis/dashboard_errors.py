@@ -1,5 +1,6 @@
 """展示已存档的验证集分组误差与相同预算对照。"""
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -64,14 +65,38 @@ def show_error_groups() -> None:
     if feature is None:
         return
     table = error_groups(FEATURES[feature])
-    rates = table.set_index("segment")[["false_positive_rate", "false_negative_rate"]]
-    st.bar_chart(
-        rates.rename(
-            columns={
-                "false_positive_rate": "误报率（FP / 实际负例）",
-                "false_negative_rate": "漏报率（FN / 实际正例）",
-            }
+    rates = table.melt(
+        id_vars="segment",
+        value_vars=["false_positive_rate", "false_negative_rate"],
+        var_name="metric",
+        value_name="rate",
+    )
+    rates["指标"] = rates.metric.map(
+        {
+            "false_positive_rate": "误报率（FP / 实际负例）",
+            "false_negative_rate": "漏报率（FN / 实际正例）",
+        }
+    )
+    st.altair_chart(
+        alt.Chart(rates)
+        .mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3)
+        .encode(
+            x=alt.X("segment:N", title="历史特征区间", sort=table.segment.tolist()),
+            xOffset="指标:N",
+            y=alt.Y(
+                "rate:Q",
+                title="分组错误率",
+                scale=alt.Scale(domain=[0, 1]),
+                axis=alt.Axis(format=".0%"),
+            ),
+            color=alt.Color("指标:N", scale=alt.Scale(range=["#147D92", "#D76B78"])),
+            tooltip=[
+                alt.Tooltip("segment:N", title="分组"),
+                "指标:N",
+                alt.Tooltip("rate:Q", title="错误率", format=".2%"),
+            ],
         )
+        .properties(height=300)
     )
     st.caption(
         "比率范围 0—1；区间左开右闭，inf 表示无上限。不同维度包含同一批候选，不能跨维度累加。"
