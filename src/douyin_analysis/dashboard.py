@@ -10,6 +10,7 @@ from douyin_analysis.dashboard_data import (
     model_metrics,
     read_report,
 )
+from douyin_analysis.dashboard_errors import show_budget_comparison, show_error_groups
 
 
 def show_features() -> None:
@@ -76,11 +77,8 @@ def model_page() -> None:
         str(REPORTS / "experiments/tree_validation_2026-11-17/precision_recall.png")
     )
     st.caption("此图为 HGB15 与 HGB31 的验证 PR 对照，未包含 LR 或六项扩展特征模型。")
-    st.subheader("固定全局预算下的命中对照")
-    st.image(
-        str(REPORTS / "errors/lr_tree_comparison_2026-11-18/equal_budget_hits.png")
-    )
-    st.caption("全局 Top-K，不等于每用户推荐 K 个商品。")
+    show_error_groups()
+    show_budget_comparison()
     st.warning(
         "验证集已用于多次比较，结果属于探索分析。LR 已评估测试集；后续树模型未访问测试集。类别加权分数未经概率校准。"
     )
@@ -90,7 +88,7 @@ def main() -> None:
     """配置双页面导航及共用口径说明。"""
     st.set_page_config(page_title="抖音商城用户行为分析", layout="wide")
     st.sidebar.title("抖音商城分析")
-    st.sidebar.caption("第二版 · 2026-11-22\n基于已保存的分析结果")
+    st.sidebar.caption("第三版 · 2026-11-23\n基于已保存的分析结果")
     st.sidebar.info("行为码释义、时区与采样完整性待确认；当前仅作离线分析。")
     page = st.navigation(
         [

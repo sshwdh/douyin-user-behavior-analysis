@@ -77,3 +77,24 @@ def test_model_page_selection() -> None:
     app.selectbox[0].select("hgb_31_extended30").run()
     assert not app.exception
     assert int(app.dataframe[1].value.iloc[1, 1]) == 366
+
+
+def test_error_group_counts_and_budget_interaction() -> None:
+    """各维度守恒，较早低频分组的相同预算对照须复现存档。"""
+    from douyin_analysis.dashboard_errors import FEATURES, error_groups
+
+    for feature in FEATURES.values():
+        table = error_groups(feature)
+        assert table.rows.sum() == 1061515
+        assert table.fn.sum() == 2158
+    with pytest.raises(ValueError, match="未知"):
+        error_groups("invalid")
+    source = "from douyin_analysis.dashboard import model_page\nmodel_page()"
+    app = AppTest.from_string(source, default_timeout=30).run()
+    app.selectbox[1].select("距最近交互小时数")
+    app.selectbox[2].select(12400)
+    app.selectbox[3].select("超过 24 小时且不超过 5 次").run()
+    assert not app.exception
+    table = app.dataframe[-1].value
+    assert table.loc["lr_24", "分组命中"] == 36
+    assert table.loc["hgb_31", "分组命中"] == 8
