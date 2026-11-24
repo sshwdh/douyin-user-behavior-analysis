@@ -2,7 +2,19 @@
 gatherUsageStats = false
 
 [theme]
-primaryColor = "#287F94"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F3F6F8"
-textColor = "#243B53"
+base = "light"
+primaryColor = "#147D92"
+backgroundColor = "#F4F6FA"
+secondaryBackgroundColor = "#EAF0F5"
+textColor = "#20364B"
+borderColor = "#DCE5ED"
+baseRadius = "large"
+buttonRadius = "large"
+showWidgetBorder = true
+chartCategoricalColors = ["#147D92", "#D98A39", "#7766AE", "#C56576", "#4D7EB1"]
+dataframeHeaderBackgroundColor = "#EAF0F5"
+
+[theme.sidebar]
+backgroundColor = "#E7EEF4"
+secondaryBackgroundColor = "#F4F7FA"
+textColor = "#20364B"

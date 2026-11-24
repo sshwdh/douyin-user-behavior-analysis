@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-24",
+  "source": "git index export",
+  "raw_data_present": false,
+  "behavior_page_passed": true,
+  "model_page_passed": true,
+  "empty_curve_selection_passed": true,
+  "cloud_install_tested": false,
+  "public_url_verified": false
+}

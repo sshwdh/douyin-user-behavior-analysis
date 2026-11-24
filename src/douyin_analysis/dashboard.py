@@ -1,17 +1,25 @@
 """Streamlit 双看板第一版：展示既有汇总、特征目录与验证结果。"""
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
 from douyin_analysis.dashboard_behavior import render_behavior
 from douyin_analysis.dashboard_data import (
-    REPORTS,
     ROOT,
     model_metrics,
     read_report,
 )
 from douyin_analysis.dashboard_errors import show_budget_comparison, show_error_groups
-from douyin_analysis.dashboard_visuals import apply_style, show_precision_recall
+from douyin_analysis.dashboard_model_charts import (
+    show_coefficients,
+    show_confusion,
+    show_coverage,
+    show_curves,
+    show_weight_experiment,
+)
+from douyin_analysis.dashboard_theme import hero, polish, style_page
+from douyin_analysis.dashboard_visuals import show_precision_recall
 
 
 def show_features() -> None:
@@ -31,67 +39,112 @@ def show_features() -> None:
 def behavior_page() -> None:
     """展示联动行为分析及独立的特征实现清单。"""
     render_behavior()
-    show_features()
+    with st.expander("特征工程 · 实现目录与完整下载"):
+        show_features()
 
 
 def model_page() -> None:
     """展示固定验证窗口的指标和混淆矩阵，避免伪造可调业务阈值。"""
-    st.title("模型验证与误差")
-    st.caption("历史窗 2025/11/25—12/02；标签窗 12/02—12/09，均为左闭右开。")
-    st.info("样本为历史七日交互过的用户商品对，预测未来七日是否观察到行为码 4。")
-    samples = read_report("features/sample_summary.csv")
-    validation = samples.loc[samples.split == "validation"].iloc[0]
-    columns = st.columns(3)
-    columns[0].metric("验证候选对", f"{int(validation.candidates):,}")
-    columns[1].metric("自然正例率", f"{validation.positive_rate:.4%}")
-    columns[2].metric("候选覆盖率", f"{validation.coverage:.2%}")
-    st.caption("覆盖率分母为未来全部行为码 4 用户商品对。候选内召回率使用不同分母。")
-    st.write(
-        "训练采用类别平衡权重；验证集保持自然分布，未过采样或欠采样。加权与不加权的独立对照尚未完成。"
+    hero(
+        "模型评估与诊断",
+        "从识别能力到错误分布，区分候选覆盖、分类效果与预测取舍。",
+        "MODEL INTELLIGENCE",
     )
     metrics = model_metrics()
-    labels = {
-        "pr_auc_average_precision": "AP",
-        "roc_auc": "ROC AUC",
-        "precision": "精确率",
-        "recall": "候选内召回率",
-        "f1": "F1",
-    }
-    st.subheader("同一验证集上的模型比较")
-    st.dataframe(metrics[list(labels)].rename(columns=labels))
-    st.bar_chart(metrics[["pr_auc_average_precision"]].rename(columns=labels))
-    show_precision_recall(metrics)
-    name = st.selectbox("查看模型", list(metrics.index), index=3)
+    name = st.selectbox("查看模型", list(metrics.index), index=3, key="selected_model")
     row = metrics.loc[name]
-    st.caption(f"既有验证集选出的 F1 阈值：{row.threshold:.6f}；尚非业务阈值。")
-    matrix = pd.DataFrame(
+    columns = st.columns(4)
+    for column, label, value in zip(
+        columns,
+        ["平均精度 AP", "精确率", "候选内召回率", "命中正例对"],
         [
-            [int(row.true_negative), int(row.false_positive)],
-            [int(row.false_negative), int(row.true_positive)],
+            f"{row.pr_auc_average_precision:.4f}",
+            f"{row.precision:.2%}",
+            f"{row.recall:.2%}",
+            f"{int(row.true_positive):,}",
         ],
-        index=["实际负例", "实际正例"],
-        columns=["预测负例", "预测正例"],
+    ):
+        column.metric(label, value)
+    st.caption(
+        "验证历史窗 2025/11/25—12/02；标签窗 12/02—12/09，均左闭右开。"
+        + f"当前模型阈值 {row.threshold:.6f}，尚非业务阈值。"
     )
-    st.subheader("混淆矩阵（用户商品对数）")
-    st.dataframe(matrix)
-    st.subheader("已有 PR 曲线")
-    st.image(
-        str(REPORTS / "experiments/tree_validation_2026-11-17/precision_recall.png")
+    overview_tab, curves_tab, errors_tab, research_tab = st.tabs(
+        ["模型总览", "曲线与阈值", "误差与预算", "权重对照与解释"]
     )
-    st.caption("此图为 HGB15 与 HGB31 的验证 PR 对照，未包含 LR 或六项扩展特征模型。")
-    show_error_groups()
-    show_budget_comparison()
-    st.warning(
-        "验证集已用于多次比较，结果属于探索分析。LR 已评估测试集；后续树模型未访问测试集。类别加权分数未经概率校准。"
+    with overview_tab:
+        left, right = st.columns(2)
+        with left, st.container(border=True):
+            st.subheader("模型排序能力 · AP 对照")
+            comparison = metrics.rename_axis("model").reset_index()
+            chart = (
+                alt.Chart(comparison)
+                .mark_bar(cornerRadiusEnd=4, color="#147D92")
+                .encode(
+                    x=alt.X("pr_auc_average_precision:Q", title="Average Precision"),
+                    y=alt.Y(
+                        "model:N", sort="-x", title=None, axis=alt.Axis(labelLimit=190)
+                    ),
+                    tooltip=[
+                        "model:N",
+                        alt.Tooltip(
+                            "pr_auc_average_precision:Q", title="AP", format=".4f"
+                        ),
+                    ],
+                )
+                .properties(height=300)
+            )
+            st.altair_chart(polish(chart))
+            st.caption(
+                "自然正例率 0.2379%。AP 适合观察稀少正例的排序质量；扩展特征仍为探索方案。"
+            )
+        with right, st.container(border=True):
+            show_precision_recall(metrics)
+        left, right = st.columns(2)
+        with left, st.container(border=True):
+            st.subheader("混淆矩阵 · 数量与行占比")
+            show_confusion(row)
+        with right, st.container(border=True):
+            st.subheader("覆盖分解 · 分类器之外的限制")
+            show_coverage(row)
+        with st.expander("查看完整模型指标与混淆计数"):
+            st.dataframe(
+                metrics[
+                    ["pr_auc_average_precision", "roc_auc", "precision", "recall", "f1"]
+                ]
+            )
+            matrix = pd.DataFrame(
+                [
+                    [int(row.true_negative), int(row.false_positive)],
+                    [int(row.false_negative), int(row.true_positive)],
+                ],
+                index=["实际负例", "实际正例"],
+                columns=["预测负例", "预测正例"],
+            )
+            st.dataframe(matrix)
+    with curves_tab:
+        show_curves()
+    with errors_tab:
+        with st.container(border=True):
+            show_error_groups()
+        with st.container(border=True):
+            show_budget_comparison()
+    with research_tab:
+        with st.container(border=True):
+            show_weight_experiment()
+        with st.container(border=True):
+            show_coefficients()
+    st.caption(
+        "验证集用于多次探索比较；LR 已使用测试集，后续树模型及本次权重对照未访问测试集。标签是未来七日是否观察到行为码 4，样本单位为用户商品对。"
     )
 
 
 def main() -> None:
     """配置双页面导航及共用口径说明。"""
     st.set_page_config(page_title="抖音商城用户行为分析", layout="wide")
-    apply_style()
+    style_page()
     st.sidebar.title("抖音商城分析")
-    st.sidebar.caption("第四版 · 2026-11-23\n基于已保存的分析结果")
+    st.sidebar.caption("第五版 · 2026-11-23\n基于已保存的分析结果")
     st.sidebar.info("行为码释义、时区与采样完整性待确认；当前仅作离线分析。")
     page = st.navigation(
         [

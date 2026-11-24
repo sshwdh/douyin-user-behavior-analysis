@@ -1,0 +1,8 @@
+{
+  "source_sha256": "967e9c2ad6320477f37cd06468418a20ee2b7ed1234e34f0ad0d9dce1537e33e",
+  "sha256": "df4ddfbf20ef196f74bbd5bd5ad6c521bba634374cdd3886475ca7d67785cfce",
+  "rows": 248,
+  "definition": "first observed day within sample, not registration day",
+  "return": "any observed behavior on exact day D+n; not cumulative",
+  "censoring": "immature is null; completeness unconfirmed"
+}

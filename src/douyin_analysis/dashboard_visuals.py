@@ -4,21 +4,9 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from douyin_analysis.dashboard_theme import polish
+
 PALETTE = ["#147D92", "#E5A24A", "#7867B5", "#D76B78"]
-
-
-def apply_style() -> None:
-    """设置轻量卡片与留白，不改变 Streamlit 导航和控件行为。"""
-    st.markdown(
-        "<style>"
-        + ".block-container{max-width:1400px;padding-top:2.2rem;}"
-        + "h1{letter-spacing:-.04em;}h2,h3{color:#174B5C;}"
-        + "[data-testid='stMetric']{background:#F2F7FA;border:1px solid #DCE8EE;"
-        + "border-radius:14px;padding:16px 20px;}"
-        + "[data-testid='stSidebar']{background:#EDF4F7;}"
-        + "</style>",
-        unsafe_allow_html=True,
-    )
 
 
 def show_behavior_mix(frame: pd.DataFrame) -> None:
@@ -47,7 +35,7 @@ def show_behavior_mix(frame: pd.DataFrame) -> None:
         )
         .properties(height=270)
     )
-    left.altair_chart(chart)
+    left.altair_chart(polish(chart))
     table = counts[["行为", "events", "占比"]].rename(columns={"events": "事件数"})
     right.dataframe(
         table,
@@ -85,7 +73,7 @@ def show_hour_profile(frame: pd.DataFrame, days: int) -> None:
         )
         .properties(height=240)
     )
-    st.altair_chart(chart)
+    st.altair_chart(polish(chart))
     peak = table.loc[table["事件数"].idxmax()]
     st.caption(
         f"当前筛选下峰值小时为 {int(peak['hour']):02d}:00，"
@@ -118,7 +106,7 @@ def show_precision_recall(metrics: pd.DataFrame) -> None:
         )
         .properties(height=300)
     )
-    st.altair_chart(chart)
+    st.altair_chart(polish(chart))
     st.caption(
         "每个点使用该模型各自已存档的验证 F1 阈值，预测数量不同；公平预算对照见下方。"
     )

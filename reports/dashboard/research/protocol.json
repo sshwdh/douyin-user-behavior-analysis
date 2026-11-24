@@ -1,0 +1,16 @@
+{
+  "created_at_utc": "2026-11-23T11:40:16.318564+00:00",
+  "feature_manifest_sha256": "14254dd3e018068a67dbf74749310d883bbfe19bfc60373c602075cd0a73569f",
+  "source_models": {
+    "lr_24": "55e8dbb9a2b855f719356db54ddfab33c9b0754ae3de0e548efa3084e1cdad3c",
+    "hgb_31": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b"
+  },
+  "change": "LR24 class_weight balanced versus None; all other parameters fixed",
+  "split": "train and validation only; no resampling",
+  "primary_metric": "validation average precision",
+  "secondary": "ROC AUC, validation-selected F1, global Top-5060 and Top-12400",
+  "threshold_rule": "maximum validation F1; ties prefer higher threshold",
+  "selection": "exploratory only; no baseline replacement or tuning",
+  "test_accessed": false,
+  "code_sha256": "39b89b3ddb42837e936d1a7d9a885771eb5b2826df93fa9b17fad5eadd01708a"
+}

@@ -1,0 +1,25 @@
+{
+  "files": {
+    "metrics": {
+      "sha256": "6d4c3b95d8baa0b8b803cf3279afd328d4808870699a5310e1b73939b9f54b46",
+      "rows": 3
+    },
+    "budgets": {
+      "sha256": "fe6078d24b87c83faa956f8e4d2d721be13f73db12d7e94cf57c29bbeb141810",
+      "rows": 6
+    },
+    "curves": {
+      "sha256": "fe2e377ecc0d668d3f1f7781e36ea839600025e39f05700df03ecf75dd799e1d",
+      "rows": 2400
+    },
+    "thresholds": {
+      "sha256": "1cfa41d16fba4e4148278570db3517d28e749d9b07475cb0c4acf008901b19e0",
+      "rows": 609
+    }
+  },
+  "test_accessed": false,
+  "new_model": "lr_24_unweighted",
+  "curve_note": "400 ordered display points; full-data metrics",
+  "validation_sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+  "train_sha256": "7057e956c15bd6f2956aeefa45aae2d14e36f5cc3a0305a24150d7d001da89e9"
+}

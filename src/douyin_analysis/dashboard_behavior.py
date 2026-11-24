@@ -12,7 +12,10 @@ from douyin_analysis.dashboard_aggregates import (
     load_aggregate,
     weekday_heatmap,
 )
+from douyin_analysis.dashboard_categories import show_category_structure
 from douyin_analysis.dashboard_data import overview
+from douyin_analysis.dashboard_retention import show_retention
+from douyin_analysis.dashboard_theme import hero, polish
 from douyin_analysis.dashboard_visuals import show_behavior_mix, show_hour_profile
 
 BEHAVIORS = {
@@ -37,7 +40,33 @@ def show_time_patterns(frame: pd.DataFrame, start: date, end: date) -> None:
     times = pd.to_datetime(frame.event_time)
     daily = frame.assign(day=times.dt.normalize()).groupby("day").events.sum()
     daily = daily.reindex(pd.date_range(start, end), fill_value=0)
-    st.line_chart(daily.rename("事件数"))
+    trend = daily.rename("事件数").rename_axis("日期").reset_index()
+    base = alt.Chart(trend).encode(
+        x=alt.X("日期:T", title=None),
+        y=alt.Y("事件数:Q"),
+        tooltip=[
+            alt.Tooltip("日期:T", format="%Y-%m-%d"),
+            alt.Tooltip("事件数:Q", format=","),
+        ],
+    )
+    st.altair_chart(
+        polish(
+            (
+                base.mark_area(color="#147D92", opacity=0.12)
+                + base.mark_line(color="#147D92", strokeWidth=2.5, point=True)
+            ).properties(height=250)
+        )
+    )
+
+
+def show_heatmap(frame: pd.DataFrame, start: date, end: date) -> None:
+    """展示按区间内星期天数归一化的热力图。
+
+    Args:
+        frame: 筛选后的小时行为。
+        start: 包含的开始日期。
+        end: 包含的结束日期。
+    """
     st.subheader("星期 × 小时热力图")
     heat = weekday_heatmap(frame, start, end)
     heat["星期"] = heat.weekday.map(dict(enumerate(WEEKDAYS)))
@@ -60,7 +89,7 @@ def show_time_patterns(frame: pd.DataFrame, start: date, end: date) -> None:
         )
         .properties(height=260)
     )
-    st.altair_chart(chart)
+    st.altair_chart(polish(chart))
     st.caption(
         "每格=该星期该小时事件数÷所选区间内该星期的天数。未包含的星期留空；保留小时内重复行为。"
     )
@@ -87,7 +116,7 @@ def show_categories(frame: pd.DataFrame) -> None:
         )
         .properties(height=max(180, count * 23))
     )
-    st.altair_chart(chart)
+    st.altair_chart(polish(chart))
     top_share = top.events.sum() / counts.events.sum()
     st.caption(
         f"当前范围共 {len(counts):,} 个有交互类目；前 {len(top)} 类目占比 {top_share:.2%}。"
@@ -152,17 +181,84 @@ def show_activity(behavior: int) -> None:
     activity = load_aggregate("user_activity")
     selected = activity.loc[activity.behavior_type == behavior].copy()
     selected["频次区间"] = selected.activity.str.split(": ").str[-1]
-    st.bar_chart(
-        selected.set_index("频次区间")[["users"]].rename(columns={"users": "用户数"})
+    chart = (
+        alt.Chart(selected)
+        .mark_bar(color="#147D92", cornerRadiusTopLeft=4, cornerRadiusTopRight=4)
+        .encode(
+            x=alt.X(
+                "频次区间:N",
+                title="交互事件数区间",
+                sort=selected["频次区间"].tolist(),
+                axis=alt.Axis(labelAngle=-25),
+            ),
+            y=alt.Y("users:Q", title="用户数"),
+            tooltip=["频次区间:N", alt.Tooltip("users:Q", title="用户数", format=",")],
+        )
+        .properties(height=260)
     )
+    st.altair_chart(polish(chart))
     st.caption(
         f"该行为全期去重用户：{int(selected.users.sum()):,}。零次交互用户不在分布内。"
     )
 
 
+def show_behavior_tabs(
+    hours: pd.DataFrame,
+    categories: pd.DataFrame,
+    selected: tuple[date, date],
+    behavior: int,
+) -> None:
+    """按专题组织同一筛选范围的图表，固定范围模块单独标注。
+
+    Args:
+        hours: 当前筛选的小时计数。
+        categories: 当前筛选的类目计数。
+        selected: 包含首尾的日期范围。
+        behavior: 当前行为码，0 表示全部。
+    """
+    days = (selected[1] - selected[0]).days + 1
+    time_tab, category_tab, users_tab = st.tabs(
+        ["时序与行为结构", "类目与长尾", "用户活跃与回访"]
+    )
+    if hours.empty:
+        st.info("该范围未观察到所选行为，不生成转化率。")
+    else:
+        with time_tab:
+            with st.container(border=True):
+                show_time_patterns(hours, *selected)
+            left, right = st.columns([1.2, 1])
+            with left, st.container(border=True):
+                show_heatmap(hours, *selected)
+            with right, st.container(border=True):
+                show_hour_profile(hours, days)
+            with st.container(border=True):
+                show_behavior_mix(
+                    filter_events(load_aggregate("hourly_behavior"), *selected, 0)
+                )
+        with category_tab:
+            with st.container(border=True):
+                show_categories(categories)
+            with st.container(border=True):
+                show_category_structure(
+                    filter_events(load_aggregate("daily_categories"), *selected, 0)
+                )
+        with users_tab:
+            left, right = st.columns(2)
+            with left, st.container(border=True):
+                show_daily_users(*selected, behavior)
+            with right, st.container(border=True):
+                show_activity(behavior)
+            with st.container(border=True):
+                show_retention()
+
+
 def render_behavior() -> None:
     """展示版本一致的概况和行为分析区，缺失范围不绘制伪零值。"""
-    st.title("用户行为与特征")
+    hero(
+        "用户行为洞察",
+        "从数据全貌出发，探索交互节律、类目结构与用户回访。每一项指标均可追溯至已核验汇总。",
+        "BEHAVIOR EXPLORER",
+    )
     quality = overview()
     start = date.fromisoformat(str(quality["start"])[:10])
     end = date.fromisoformat(str(quality["end"])[:10])
@@ -174,10 +270,13 @@ def render_behavior() -> None:
     ):
         column.metric(label, f"{int(quality[key]):,}")
     st.caption("以上为全观察期概况。下面日期与行为联动影响趋势、热力图和类目分析。")
-    selected = st.date_input(
-        "分析日期范围", value=(start, end), min_value=start, max_value=end
-    )
-    selected_behavior = st.selectbox("分析行为", list(BEHAVIORS))
+    date_column, behavior_column = st.columns([1.6, 1])
+    with date_column:
+        selected = st.date_input(
+            "分析日期范围", value=(start, end), min_value=start, max_value=end
+        )
+    with behavior_column:
+        selected_behavior = st.selectbox("分析行为", list(BEHAVIORS))
     if (
         selected_behavior is None
         or not isinstance(selected, tuple)
@@ -190,15 +289,12 @@ def render_behavior() -> None:
     categories = filter_events(load_aggregate("daily_categories"), *selected, behavior)
     if int(hours.events.sum()) != int(categories.events.sum()):
         raise ValueError("当前筛选范围的小时与类目事件数不一致")
-    st.metric("当前筛选事件数", f"{int(hours.events.sum()):,}")
-    if hours.empty:
-        st.info("该范围未观察到所选行为，不生成转化率。")
-    else:
-        show_behavior_mix(
-            filter_events(load_aggregate("hourly_behavior"), *selected, 0)
-        )
-        show_time_patterns(hours, *selected)
-        show_hour_profile(hours, (selected[1] - selected[0]).days + 1)
-        show_daily_users(*selected, behavior)
-        show_categories(categories)
-    show_activity(behavior)
+    columns = st.columns(3)
+    columns[0].metric("当前筛选事件数", f"{int(hours.events.sum()):,}")
+    days = (selected[1] - selected[0]).days + 1
+    columns[1].metric("日均事件数", f"{hours.events.sum() / days:,.0f}")
+    columns[2].metric("有交互类目", f"{categories.category_id.nunique():,}")
+    st.caption(
+        f"当前范围：{selected[0]} 至 {selected[1]} · {days} 个自然日 · {selected_behavior}"
+    )
+    show_behavior_tabs(hours, categories, selected, behavior)

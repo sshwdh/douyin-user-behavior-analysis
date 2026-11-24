@@ -91,10 +91,10 @@ def test_error_group_counts_and_budget_interaction() -> None:
         error_groups("invalid")
     source = "from douyin_analysis.dashboard import model_page\nmodel_page()"
     app = AppTest.from_string(source, default_timeout=30).run()
-    app.selectbox[1].select("距最近交互小时数")
-    app.selectbox[2].select(12400)
-    app.selectbox[3].select("超过 24 小时且不超过 5 次").run()
+    app.selectbox[2].select("距最近交互小时数")
+    app.selectbox[3].select(12400)
+    app.selectbox[4].select("超过 24 小时且不超过 5 次").run()
     assert not app.exception
-    table = app.dataframe[-1].value
+    table = app.dataframe[3].value
     assert table.loc["lr_24", "分组命中"] == 36
     assert table.loc["hgb_31", "分组命中"] == 8
