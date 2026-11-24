@@ -4,6 +4,8 @@
 
 [![quality](https://github.com/sshwdh/douyin-user-behavior-analysis/actions/workflows/quality.yml/badge.svg)](https://github.com/sshwdh/douyin-user-behavior-analysis/actions/workflows/quality.yml)
 
+**[打开在线双看板](https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/)** · 无需登录，支持日期与行为筛选、模型对照和汇总下载。2026-11-24 已通过独立未登录浏览器验收，详见[部署验收记录](docs/17_在线部署与交付清单.md)。
+
 ## 2026-11-17 口径确认
 
 带教通过用户确认采用 **用户＋商品＋行为＋自然小时** 分组。本批最大频次为 22，没有超过 100 次的组：**全部 12,256,906 条有效记录保留，不去重、不隔离**。此前跨商品暂行隔离的 1,316,083 条已恢复。详见[本次确认与核验记录](docs/daily/2026-11-17_清洗口径确认与全量重跑.md)。
@@ -122,7 +124,7 @@ python3.12 -m venv .venv
 
 ## 第三周提前启动：Streamlit 双看板
 
-2026-11-23 已升级至第五版：专题标签页、统一视觉层级、回访队列热力图、类目结构散点、真实 PR/ROC、阈值敏感性、混淆矩阵、覆盖分解及 LR 类别权重对照。详见[新增研究结果](docs/18_类别权重对照与回访分析.md)与[实际浏览器截图](reports/dashboard/screenshots/2026-11-23/)。公网部署尚未完成。
+2026-11-23 已升级至第五版：专题标签页、统一视觉层级、回访队列热力图、类目结构散点、真实 PR/ROC、阈值敏感性、混淆矩阵、覆盖分解及 LR 类别权重对照。详见[新增研究结果](docs/18_类别权重对照与回访分析.md)与[实际浏览器截图](reports/dashboard/screenshots/2026-11-23/)。2026-11-24 已完成云端部署及未登录访问验收。
 
 - [特征汇总 Excel（实现核对版）](outputs/2026-11-22/特征拆分整理_实现核对版.xlsx)
 - [特征汇总 CSV（GitHub 可直接预览）](reports/features/feature_catalog.csv)
@@ -137,6 +139,6 @@ python -m pip install -e '.[dashboard]'
 python -m streamlit run scripts/run_dashboard.py --server.address 127.0.0.1 --browser.gatherUsageStats false
 ```
 
-中文路径若遇到安装编码错误，使用 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` 运行安装和启动命令。当前服务仅供本机查看；GitHub 链接是代码和产物入口，不是在线托管看板。
+中文路径若遇到安装编码错误，使用 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` 运行安装和启动命令。上述命令启动的服务仅供本机查看；GitHub 链接是代码和产物入口，不是在线托管看板。
 
-在线交付采用 Streamlit Community Cloud，配置见[部署与交付清单](docs/17_在线部署与交付清单.md)。根目录 requirements.txt 已准备；目前尚未获得经过访问验证的公网看板地址。
+在线交付采用 Streamlit Community Cloud，配置见[部署与交付清单](docs/17_在线部署与交付清单.md)。根目录 requirements.txt 已完成云端安装；[在线双看板](https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/)已通过未登录访问、筛选、曲线及下载核验。

@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-24",
+  "environment": "fresh temporary Python venv on macOS; public Git index export only",
+  "requirements": "root requirements.txt",
+  "install_passed": true,
+  "behavior_page_passed": true,
+  "model_page_passed": true,
+  "cloud_linux_build_verified": false,
+  "public_access_verified": false,
+  "versions": {
+    "streamlit": "1.67.0",
+    "pandas": "3.1.1",
+    "altair": "6.3.0",
+    "numpy": "2.5.5",
+    "scikit-learn": "1.9.1"
+  }
+}

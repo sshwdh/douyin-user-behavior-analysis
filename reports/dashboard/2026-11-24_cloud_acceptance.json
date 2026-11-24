@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-11-24T10:45:12.622Z",
+  "url": "https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/",
+  "anonymous_new_context": true,
+  "overview_total": 12256906,
+  "code4_total": 120205,
+  "nov18_code4": 3730,
+  "category_csv_download_matches": true,
+  "feature_xlsx_sha256": "25e6da0c38bdf327436b543af9623b0fa21ca353f97a65e4961aea9afab94347",
+  "model_switch_hits": 366,
+  "curves_rendered": true,
+  "page_errors": [],
+  "deployed_code_commit": "ac11a1c44270e2d3d49ef6c7b45851e7e46984eb",
+  "cloud_build_verified": true,
+  "cloud_python": "3.12.16",
+  "cloud_streamlit": "1.67.0",
+  "cloud_pyarrow": "24.0.0"
+}
