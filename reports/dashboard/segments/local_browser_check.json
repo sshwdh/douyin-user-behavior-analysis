@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-11-25T18:25:24.055Z",
+  "url": "http://127.0.0.1:8502",
+  "anonymous_new_context": true,
+  "feature_switch": "pair_cart",
+  "feature_download_rows": 1061515,
+  "feature_download_positives": 2525,
+  "performance_dimension": "item_users",
+  "performance_models": 3,
+  "performance_download_conserved": true,
+  "page_errors": []
+}

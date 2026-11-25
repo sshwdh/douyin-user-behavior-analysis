@@ -18,6 +18,10 @@ from douyin_analysis.dashboard_model_charts import (
     show_curves,
     show_weight_experiment,
 )
+from douyin_analysis.dashboard_segments import (
+    show_associations,
+    show_segment_performance,
+)
 from douyin_analysis.dashboard_theme import hero, polish, style_page
 from douyin_analysis.dashboard_visuals import show_precision_recall
 
@@ -41,6 +45,8 @@ def behavior_page() -> None:
     render_behavior()
     with st.expander("特征工程 · 实现目录与完整下载"):
         show_features()
+    with st.expander("特征与目标 · 分箱正例率"):
+        show_associations()
 
 
 def model_page() -> None:
@@ -144,6 +150,8 @@ def model_page() -> None:
             show_weight_experiment()
         with st.container(border=True):
             show_coefficients()
+    with st.expander("用户与商品分层 · 三模型表现"):
+        show_segment_performance()
     st.caption(
         "验证集用于多次探索比较；LR 已使用测试集，后续树模型及本次权重对照未访问测试集。标签是未来七日是否观察到行为码 4，样本单位为用户商品对。"
     )

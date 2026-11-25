@@ -1,0 +1,22 @@
+{
+  "boundary_rule": "zero bin; positive train-only thirds; higher quantiles; merge duplicate cuts; right closed; overflow in last bin",
+  "boundary_population": "pair features: training candidate pairs; user_events: distinct training users; item_users: distinct training items",
+  "features": {
+    "pair_pv": "\u5386\u53f2\u6d4f\u89c8\u6b21\u6570\uff08\u6682\u91ca\uff09",
+    "pair_fav": "\u5386\u53f2\u6536\u85cf\u6b21\u6570\uff08\u6682\u91ca\uff09",
+    "pair_cart": "\u5386\u53f2\u52a0\u8d2d\u6b21\u6570\uff08\u6682\u91ca\uff09",
+    "pair_recency_hours": "\u8ddd\u6700\u8fd1\u4ea4\u4e92\u5c0f\u65f6\u6570",
+    "user_events": "\u7528\u6237\u5386\u53f2\u4ea4\u4e92\u6b21\u6570",
+    "item_users": "\u5546\u54c1\u5386\u53f2\u4ea4\u4e92\u7528\u6237\u6570"
+  },
+  "test_accessed": false,
+  "model_retrained": false,
+  "threshold_changed": false,
+  "feature_manifest_sha256": "14254dd3e018068a67dbf74749310d883bbfe19bfc60373c602075cd0a73569f",
+  "model_hashes": {
+    "lr_24": "55e8dbb9a2b855f719356db54ddfab33c9b0754ae3de0e548efa3084e1cdad3c",
+    "hgb_31": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b",
+    "lr_24_unweighted": "99860fc14e1dd581ad6069fb6a236aad785a675bd94af1edc86b36cf88446fb2"
+  },
+  "code_sha256": "6ac0eab79170854d060c8b4ed615b31fc4581cae2c01a564aaba9614f72d4091"
+}

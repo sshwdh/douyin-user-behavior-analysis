@@ -1,0 +1,11 @@
+{
+  "source_csv_sha256": {
+    "associations.csv": "69b328f7ce6d05935a75436ff6f331ed3e1941a4a6c6b4c88025449492743da5",
+    "performance.csv": "48c52ca9afe0f559aa390d94d7b441b215c4963318ca8dab6c8d6edd20d9318c"
+  },
+  "figures": {
+    "item_users_performance.png": "f7a74ad3ee02c16ebe3d96a2707132c0019d1c58199a3f959f72e78218a5731f",
+    "user_events_performance.png": "1cab2a44da4e414ba8b276736aea7bf0006e8e72f8941ae9b000f2ebe73be58f",
+    "feature_associations.png": "07d1ea2a6d3686bd3b13d90b102fe1e6f222f85fa0d8102e0c96755ba08987b3"
+  }
+}

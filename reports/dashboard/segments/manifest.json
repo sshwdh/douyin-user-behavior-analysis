@@ -1,0 +1,15 @@
+{
+  "files": {
+    "associations.csv": "69b328f7ce6d05935a75436ff6f331ed3e1941a4a6c6b4c88025449492743da5",
+    "performance.csv": "48c52ca9afe0f559aa390d94d7b441b215c4963318ca8dab6c8d6edd20d9318c",
+    "bins.json": "a40ab81f3725a2764e115deb8ada7a84da1485d2a108e7cd8c3e61a174242a2b",
+    "protocol.json": "d5bcff6038d08388d7c538063e02d442f5297bb511daa2bcecc1125437343f6c"
+  },
+  "train_sha256": "7057e956c15bd6f2956aeefa45aae2d14e36f5cc3a0305a24150d7d001da89e9",
+  "validation_sha256": "5d55a2160bdff35f43f2019c2b307f066a5cae8b51dc1e58b76e9b979bdc7f12",
+  "validation_rows": 1061515,
+  "validation_positives": 2525,
+  "test_accessed": false,
+  "model_retrained": false,
+  "threshold_changed": false
+}
