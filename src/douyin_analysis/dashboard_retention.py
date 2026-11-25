@@ -36,7 +36,12 @@ def show_retention() -> None:
     for column, day in zip(columns, [1, 3, 7]):
         if day in summary.index:
             row = summary.loc[day]
-            column.metric(f"D{day} 当日回访率", f"{row.rate:.2%}")
+            column.metric(
+                f"D{day} 当日回访率",
+                f"{row.rate:.2%}",
+                help=f"成熟首观测队列中，恰好第 {day} 天有任意交互的人数 ÷ 队列人数。"
+                + "同日重复交互只计一人；固定全观察期，不随顶部筛选变化。",
+            )
             column.caption(
                 f"成熟队列人数 {int(row.cohort_users):,} · 回访 {int(row.returning_users):,}"
             )

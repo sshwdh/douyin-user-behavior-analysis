@@ -268,7 +268,16 @@ def render_behavior() -> None:
         ["有效事件", "用户", "商品", "类目"],
         ["clean_rows", "users", "items", "categories"],
     ):
-        column.metric(label, f"{int(quality[key]):,}")
+        column.metric(
+            label,
+            f"{int(quality[key]):,}",
+            help=f"全观察期 {start} 至 {end} 的{label}；不随下方筛选变化。"
+            + (
+                "单位：条；正常重复交互保留。"
+                if key == "clean_rows"
+                else "按标识去重计数。"
+            ),
+        )
     st.caption("以上为全观察期概况。下面日期与行为联动影响趋势、热力图和类目分析。")
     date_column, behavior_column = st.columns([1.6, 1])
     with date_column:
@@ -290,10 +299,22 @@ def render_behavior() -> None:
     if int(hours.events.sum()) != int(categories.events.sum()):
         raise ValueError("当前筛选范围的小时与类目事件数不一致")
     columns = st.columns(3)
-    columns[0].metric("当前筛选事件数", f"{int(hours.events.sum()):,}")
+    columns[0].metric(
+        "当前筛选事件数",
+        f"{int(hours.events.sum()):,}",
+        help="所选日期（含首尾日期）及行为下的事件条数；保留正常重复交互。",
+    )
     days = (selected[1] - selected[0]).days + 1
-    columns[1].metric("日均事件数", f"{hours.events.sum() / days:,.0f}")
-    columns[2].metric("有交互类目", f"{categories.category_id.nunique():,}")
+    columns[1].metric(
+        "日均事件数",
+        f"{hours.events.sum() / days:,.0f}",
+        help=f"当前筛选事件数 ÷ 所选 {days} 个自然日；不是仅按有事件的天数计算。",
+    )
+    columns[2].metric(
+        "有交互类目",
+        f"{categories.category_id.nunique():,}",
+        help="当前日期与行为筛选下出现过事件的不同类目数；不是类目事件次数。",
+    )
     st.caption(
         f"当前范围：{selected[0]} 至 {selected[1]} · {days} 个自然日 · {selected_behavior}"
     )

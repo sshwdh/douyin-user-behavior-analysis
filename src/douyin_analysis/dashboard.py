@@ -54,7 +54,7 @@ def model_page() -> None:
     name = st.selectbox("查看模型", list(metrics.index), index=3, key="selected_model")
     row = metrics.loc[name]
     columns = st.columns(4)
-    for column, label, value in zip(
+    for column, label, value, explanation in zip(
         columns,
         ["平均精度 AP", "精确率", "候选内召回率", "命中正例对"],
         [
@@ -63,11 +63,21 @@ def model_page() -> None:
             f"{row.recall:.2%}",
             f"{int(row.true_positive):,}",
         ],
+        [
+            "全部验证预测计算的 Average Precision；不是准确率，也不是展示曲线的面积。",
+            "命中正例对 ÷ 预测正例对；使用当前模型的验证 F1 阈值。",
+            "命中正例对 ÷ 候选内 2,525 个正例对；不包含候选外正例。",
+            "当前模型阈值下正确识别的正例用户商品对数；不是购买事件次数。",
+        ],
     ):
-        column.metric(label, value)
+        column.metric(label, value, help=explanation)
     st.caption(
         "验证历史窗 2025/11/25—12/02；标签窗 12/02—12/09，均左闭右开。"
         + f"当前模型阈值 {row.threshold:.6f}，尚非业务阈值。"
+    )
+    st.caption(
+        "固定验证候选 1,061,515 对，正例 2,525 对；不随行为页日期筛选变化。"
+        + "各模型阈值与预测量不同，相同预算比较请查看全局 Top-K。"
     )
     overview_tab, curves_tab, errors_tab, research_tab = st.tabs(
         ["模型总览", "曲线与阈值", "误差与预算", "权重对照与解释"]
