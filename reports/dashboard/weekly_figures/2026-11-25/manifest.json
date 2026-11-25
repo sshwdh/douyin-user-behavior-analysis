@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-25",
+  "purpose": "weekly report standalone figures; no new training",
+  "sources": {
+    "reports/dashboard/research/metrics.csv": "6d4c3b95d8baa0b8b803cf3279afd328d4808870699a5310e1b73939b9f54b46",
+    "reports/dashboard/research/budgets.csv": "fe6078d24b87c83faa956f8e4d2d721be13f73db12d7e94cf57c29bbeb141810",
+    "reports/dashboard/research/cohorts.csv": "df4ddfbf20ef196f74bbd5bd5ad6c521bba634374cdd3886475ca7d67785cfce",
+    "docs/10_窗口特征与样本核验.md": "05881f3f2ffee471a0fa8d52d688c9fc04f8520f6a376766a914acc16ddc1746"
+  },
+  "figures": {
+    "04_return.png": "be9dc47b8e550e07603f2f34fabfe6bdf6c61d25fe83232d97b09a06741891f9",
+    "03_coverage.png": "83b5585f70c94a28b08a6c96f93f816abb85d00153671dd605353f610a18fe9e",
+    "02_budget.png": "6155205e915b5e16f843f65cda1e5825f9862ff7a595f33fa1873a79e118a55f",
+    "01_ap.png": "ac90f3b7dad594eed3f375d2d5b2dc84f689666251134a35a8e45464d594cbe6"
+  }
+}
