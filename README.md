@@ -142,3 +142,8 @@ python -m streamlit run scripts/run_dashboard.py --server.address 127.0.0.1 --br
 中文路径若遇到安装编码错误，使用 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` 运行安装和启动命令。上述命令启动的服务仅供本机查看；GitHub 链接是代码和产物入口，不是在线托管看板。
 
 在线交付采用 Streamlit Community Cloud，配置见[部署与交付清单](docs/17_在线部署与交付清单.md)。根目录 requirements.txt 已完成云端安装；[在线双看板](https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/)已通过未登录访问、筛选、曲线及下载核验。
+
+## 第三周交付材料（截至 2026-11-25）
+
+- [双看板使用与演示说明](docs/19_双看板使用与演示说明.md)
+- [第三周 PDF 阶段初稿](output/pdf/2026-11-25_第三周项目汇报_阶段初稿.pdf)：12 页，八张看板截图，11/27 按实际进展定稿。
