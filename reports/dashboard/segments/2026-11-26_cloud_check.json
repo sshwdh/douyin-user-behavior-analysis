@@ -1,0 +1,14 @@
+{
+  "checked_at": "2026-11-26T09:28:45.896Z",
+  "url": "https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/",
+  "anonymous_new_context": true,
+  "feature_switch": "pair_cart",
+  "feature_download_rows": 1061515,
+  "feature_download_positives": 2525,
+  "performance_dimension": "item_users",
+  "performance_models": 3,
+  "performance_download_conserved": true,
+  "page_errors": [],
+  "stage": "feature release acceptance before readability update",
+  "release_commit": "615d02f"
+}

@@ -10,6 +10,12 @@ from douyin_analysis.dashboard_data import REPORTS
 from douyin_analysis.pipeline import file_digest
 from douyin_analysis.segment_analysis import FEATURES
 
+MODEL_LABELS = {
+    "lr_24": "LR24 加权",
+    "lr_24_unweighted": "LR24 未加权",
+    "hgb_31": "HGB31",
+}
+
 
 def load_segments(name: str) -> pd.DataFrame:
     """读取已核对指纹的公开分箱结果。
@@ -43,14 +49,24 @@ def show_associations() -> None:
     table = table.loc[table.feature == feature].copy()
     baseline = table.positives.sum() / table.rows.sum()
     left, right = st.columns(2)
-    chart_table = table.assign(
+    chart_table = table.loc[table.rows > 0].assign(
         support_label=table.low_positive_support.map(
             {True: "正例少于30对", False: "正例至少30对"}
         )
     )
     base = alt.Chart(chart_table).encode(
-        x=alt.X("segment:N", sort=table.segment.tolist(), title="训练历史特征区间"),
-        tooltip=["segment:N", "rows:Q", "positives:Q", "positive_rate:Q"],
+        x=alt.X(
+            "segment:N",
+            sort=chart_table.segment.tolist(),
+            title="训练历史特征区间",
+            axis=alt.Axis(labelAngle=0),
+        ),
+        tooltip=[
+            alt.Tooltip("segment:N", title="历史区间"),
+            alt.Tooltip("rows:Q", title="候选对数", format=",d"),
+            alt.Tooltip("positives:Q", title="正例对数", format=",d"),
+            alt.Tooltip("positive_rate:Q", title="正例率", format=".3%"),
+        ],
     )
     with left:
         st.altair_chart(
@@ -61,7 +77,14 @@ def show_associations() -> None:
     with right:
         rates = base.mark_point(filled=True, size=100).encode(
             y=alt.Y("positive_rate:Q", title="箱内正例率", axis=alt.Axis(format=".2%")),
-            color=alt.Color("support_label:N", title="分组支持量"),
+            color=alt.Color(
+                "support_label:N",
+                title="分组支持量",
+                scale=alt.Scale(
+                    domain=["正例少于30对", "正例至少30对"],
+                    range=["#dfa24b", "#147D92"],
+                ),
+            ),
         )
         line = (
             alt.Chart(pd.DataFrame({"baseline": [baseline]}))
@@ -71,7 +94,7 @@ def show_associations() -> None:
         st.altair_chart((rates + line).properties(height=280))
     st.caption(
         f"虚线为验证候选总体正例率 {baseline:.4%}。分母是用户商品对，不是事件次数；"
-        + "不同特征包含同一批候选，不能跨特征累加。空箱正例率留空。"
+        + "不同特征包含同一批候选，不能跨特征累加。图中仅显示有样本的箱，空箱保留在表中。"
     )
     st.dataframe(
         table[
@@ -83,7 +106,8 @@ def show_associations() -> None:
                 "train_pair_count",
                 "low_positive_support",
             ]
-        ].rename(
+        ]
+        .rename(
             columns={
                 "rows": "验证候选对数",
                 "positives": "实际正例对",
@@ -101,13 +125,15 @@ def show_associations() -> None:
                 "low_positive_support": "正例少于30",
                 "low_prediction_support": "预测正例少于30",
             }
-        ),
+        )
+        .style.format({"箱内正例率": "{:.3%}"}, na_rep="—"),
         hide_index=True,
     )
     st.caption(
         "右闭区间，inf 表示无上限；正例少于 30 对仅作描述。关联不代表因果、"
         + "特征独立贡献或稳定提升；同一用户的候选相关，未提供独立样本置信区间。"
     )
+    st.caption("CSV 保留原始数值：比率 0.01 表示 1%；空值表示无有效分母，不能当作零。")
     st.download_button(
         "下载当前特征分箱汇总",
         table.to_csv(index=False).encode("utf-8-sig"),
@@ -129,6 +155,7 @@ def show_segment_performance() -> None:
         "候选内召回率": "recall",
         "精确率": "precision",
         "命中正例对": "tp",
+        "预测正例对数": "predicted_positive",
         "平均精度 AP": "ap",
         "ROC AUC": "roc_auc",
     }
@@ -136,35 +163,55 @@ def show_segment_performance() -> None:
     metric = metric_names[str(metric_label)]
     table = load_segments("performance")
     table = table.loc[table.feature == feature].copy()
+    chart_table = table.loc[table.rows > 0].assign(
+        model_label=table.model.map(MODEL_LABELS)
+    )
     st.altair_chart(
-        alt.Chart(table)
+        alt.Chart(chart_table)
         .mark_bar()
         .encode(
             x=alt.X(
-                "segment:N", sort=table.segment.unique().tolist(), title="历史区间"
+                "segment:N",
+                sort=chart_table.segment.unique().tolist(),
+                title="历史区间",
+                axis=alt.Axis(labelAngle=0),
             ),
-            xOffset="model:N",
+            xOffset=alt.XOffset("model_label:N", sort=list(MODEL_LABELS.values())),
             y=alt.Y(
                 f"{metric}:Q",
                 title=str(metric_label),
-                axis=alt.Axis(format=",d" if metric == "tp" else ".1%"),
+                axis=alt.Axis(
+                    format=(
+                        ",d"
+                        if metric in {"tp", "predicted_positive"}
+                        else (".4f" if metric == "ap" else ".1%")
+                    )
+                ),
             ),
-            color="model:N",
+            color=alt.Color(
+                "model_label:N",
+                title="模型",
+                scale=alt.Scale(
+                    domain=list(MODEL_LABELS.values()),
+                    range=["#dfa24b", "#58a6ab", "#176a80"],
+                ),
+            ),
             tooltip=[
-                "model:N",
-                "segment:N",
-                "rows:Q",
-                "positives:Q",
-                "predicted_positive:Q",
-                "tp:Q",
-                "precision:Q",
-                "recall:Q",
+                alt.Tooltip("model_label:N", title="模型"),
+                alt.Tooltip("segment:N", title="历史区间"),
+                alt.Tooltip("rows:Q", title="候选对数", format=",d"),
+                alt.Tooltip("positives:Q", title="正例对数", format=",d"),
+                alt.Tooltip("predicted_positive:Q", title="预测正例对数", format=",d"),
+                alt.Tooltip("tp:Q", title="命中", format=",d"),
+                alt.Tooltip("precision:Q", title="精确率", format=".2%"),
+                alt.Tooltip("recall:Q", title="召回率", format=".2%"),
+                alt.Tooltip(f"{metric}:Q", title=str(metric_label)),
             ],
         )
         .properties(height=320)
     )
     st.dataframe(
-        table[
+        table.assign(model=table.model.map(MODEL_LABELS))[
             [
                 "model",
                 "segment",
@@ -182,7 +229,8 @@ def show_segment_performance() -> None:
                 "low_positive_support",
                 "low_prediction_support",
             ]
-        ].rename(
+        ]
+        .rename(
             columns={
                 "rows": "验证候选对数",
                 "positives": "实际正例对",
@@ -200,6 +248,15 @@ def show_segment_performance() -> None:
                 "low_positive_support": "正例少于30",
                 "low_prediction_support": "预测正例少于30",
             }
+        )
+        .style.format(
+            {
+                "精确率": "{:.2%}",
+                "候选内召回率": "{:.2%}",
+                "ap": "{:.4f}",
+                "roc_auc": "{:.4f}",
+            },
+            na_rep="—",
         ),
         hide_index=True,
     )
@@ -213,6 +270,7 @@ def show_segment_performance() -> None:
         + "展示指标仍按验证候选对计数，不是用户平均。正例或预测正例少于 30 对已标记。"
         + "历史候选不覆盖真正无交互对象，不作为冷启动专项结论。"
     )
+    st.caption("CSV 保留原始数值：比率 0.01 表示 1%；空值表示无有效分母，不能当作零。")
     st.download_button(
         "下载当前分层模型汇总",
         table.to_csv(index=False).encode("utf-8-sig"),

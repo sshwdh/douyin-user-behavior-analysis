@@ -1,0 +1,13 @@
+{
+  "black": true,
+  "isort": true,
+  "flake8": true,
+  "mypy": true,
+  "pylint": true,
+  "pytest": true,
+  "project_rules": true,
+  "date": "2026-11-26",
+  "tests_passed": 59,
+  "changes": "display formatting, model labels, nonempty charts and predicted-positive count selector",
+  "analysis_values_changed": false
+}
