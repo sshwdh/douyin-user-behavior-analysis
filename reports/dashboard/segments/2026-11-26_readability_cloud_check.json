@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-11-26T17:19:17.568Z",
+  "url": "https://rundashboardpy-p5s7wh8jdprnz7a9bx6f4h.streamlit.app/",
+  "anonymous_new_context": true,
+  "feature_switch": "pair_cart",
+  "feature_download_rows": 1061515,
+  "feature_download_positives": 2525,
+  "performance_dimension": "item_users",
+  "performance_models": 3,
+  "predicted_positive_chart_verified": true,
+  "performance_download_conserved": true,
+  "page_errors": [],
+  "release_commit": "c62a82ddf4513277994e2c29808ee3de1acad54e",
+  "cloud_reboot_before_acceptance": true,
+  "visual_reviewed": true
+}
