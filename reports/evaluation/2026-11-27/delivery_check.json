@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-27",
+  "tests_passed": 62,
+  "quality_checks_passed": true,
+  "pdf_pages": [
+    8,
+    3
+  ],
+  "pdf_visual_reviewed": true,
+  "original_weekly_report_unchanged": true,
+  "test_accessed_this_run": false,
+  "files": {
+    "output/pdf/2026-11-27_\u6a21\u578b\u8bc4\u4f30\u8865\u5145\u62a5\u544a.pdf": "da7f5c3ada74c179b34429f206927602a8c5c8fb6885aae29b5a8890ee27e97b",
+    "output/pdf/2026-11-27_\u9879\u76ee\u603b\u7ed3\u7b80\u62a5_\u7ed3\u9879\u51c6\u5907\u7248.pdf": "53e152387048e70a5feccb2c94519906e389738d52a5270d76b8cac4c3e221aa"
+  }
+}

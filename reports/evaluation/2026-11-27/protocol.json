@@ -1,0 +1,35 @@
+{
+  "created_at_utc": "2026-11-27T19:58:19.482684+00:00",
+  "feature_manifest_sha256": "14254dd3e018068a67dbf74749310d883bbfe19bfc60373c602075cd0a73569f",
+  "code_sha256": "e65c9b83df6b2ae84843945ad43380a7e47ad783690e4d22a2873d533c93d087",
+  "models": {
+    "lr_24": "55e8dbb9a2b855f719356db54ddfab33c9b0754ae3de0e548efa3084e1cdad3c",
+    "hgb_31": "8ebe0d8fe1f7fc79861e73c6dabe9cdaaa4eedb7b8d588465e426549dd25286b",
+    "lr_24_unweighted": "99860fc14e1dd581ad6069fb6a236aad785a675bd94af1edc86b36cf88446fb2"
+  },
+  "fractions": [
+    0.1,
+    0.3,
+    0.6,
+    1.0
+  ],
+  "seed": 42,
+  "threads": 1,
+  "sampling": "nested stratified subsets of training only; same full validation",
+  "full_model": "reuse archived fitted model at 100%; no refit or overwrite",
+  "preprocessing": "clone refits scaler on each training subset",
+  "selection": "diagnostic only; no threshold or model selection",
+  "test_accessed_this_run": false,
+  "test_history": "LR test evaluated on 2026-11-17; not a fresh holdout",
+  "cases": "highest-score FP and lowest-score FN, two each per model; illustrative extremes",
+  "benchmark": "separate process per model; batches 1/1000/10000",
+  "warmups": 2,
+  "repetitions": 7,
+  "timed_scope": "in-memory feature transform plus predict_proba; excludes IO, load, feature generation, HTTP",
+  "memory": "process lifetime peak RSS includes Python, imports, model and batch; not model incremental memory",
+  "platform": "macOS-13.4-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "3.12.2",
+  "sklearn": "1.9.1",
+  "gpu": "not used"
+}

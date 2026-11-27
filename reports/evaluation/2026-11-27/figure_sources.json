@@ -1,0 +1,16 @@
+{
+  "source_sha256": {
+    "reports/dashboard/research/curves.csv": "fe2e377ecc0d668d3f1f7781e36ea839600025e39f05700df03ecf75dd799e1d",
+    "reports/dashboard/research/metrics.csv": "6d4c3b95d8baa0b8b803cf3279afd328d4808870699a5310e1b73939b9f54b46",
+    "reports/dashboard/research/budgets.csv": "fe6078d24b87c83faa956f8e4d2d721be13f73db12d7e94cf57c29bbeb141810",
+    "src/douyin_analysis/evaluation_figures.py": "b0a84c2ab8ea734051684a74b4ef56d179b99fd3351ac738d3963210afcaa075"
+  },
+  "figure_sha256": {
+    "learning_curves.png": "ba59c5b6c1d4a6334f55c4d12478fee73d534ae84ec483b038381a770ba916cd",
+    "roc_pr_reused.png": "67e27c61ccee57719fa548c1366118583afb112ed92f4a2d4102b9fb5ffa5233",
+    "confusion_reused.png": "f43d34804c31ee01cd4ad394befe83dca33f75c618d925054535f5ff89dad693",
+    "inference_benchmark.png": "882aff98cbb0c1250a1c5b61f8e75e72301f8c27af9f11a832ea96f9056b8fee"
+  },
+  "benchmark_summary_sha256": "bbe8ae98546c9bbb84c288eb9da3aa548694730c219eb7840e05293cf6963b97",
+  "curve_display": "reuse archived ordered points; no metric integration from plotted curves"
+}

@@ -1,0 +1,10 @@
+{
+  "files": {
+    "benchmark_hgb_31.csv": "01d874109be727a68ec58f797874f681570fbc421bf02b5e27abeed403f38416",
+    "benchmark_lr_24.csv": "61f05aea15cacb9e9a59607971e994432b20ebda36306d9565945f316c398f47",
+    "benchmark_lr_24_unweighted.csv": "c29cf2e699976dc48fca19536afc3262da1b8a5338f5026cf7686e27b1223b67",
+    "error_cases.csv": "a8adeaf1d165bcdd9199730a5915d7f725cafc4794967a2c9eb300d029d18ec1",
+    "learning_curves.csv": "d9b0c2cc2cd32c694e48aeff5d59efab3d6d493fb5c83b1efce6f7eb4b7860a7"
+  },
+  "test_accessed_this_run": false
+}

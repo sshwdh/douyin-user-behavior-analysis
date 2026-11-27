@@ -7,7 +7,7 @@ name = "douyin-analysis"
 version = "0.1.0"
 description = "Reproducible e-commerce behavior analysis"
 requires-python = ">=3.10"
-dependencies = ["pandas>=2.2", "pyarrow>=15", "duckdb>=1.1", "matplotlib>=3.8", "scikit-learn>=1.4", "numpy>=1.26", "joblib>=1.3"]
+dependencies = ["pandas>=2.2", "pyarrow>=15", "duckdb>=1.1", "matplotlib>=3.8", "scikit-learn>=1.4", "numpy>=1.26", "joblib>=1.3", "threadpoolctl>=3.1"]
 
 [project.optional-dependencies]
 dev = ["black", "isort", "flake8", "mypy", "pylint", "pytest", "pandas-stubs"]
