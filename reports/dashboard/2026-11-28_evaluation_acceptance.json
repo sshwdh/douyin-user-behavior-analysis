@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-28",
+  "release_commit": "6d44aa5",
+  "public_app_loaded": true,
+  "sidebar_version": "评估补充版 · 2026-11-28",
+  "evaluation_tabs_visible": [
+    "学习曲线",
+    "匿名错误案例",
+    "推理与资源",
+    "报告下载"
+  ],
+  "pdf_buttons_visible": true,
+  "public_pdf_download_completed": false,
+  "download_limitation": "Browser session disappeared during download check; retry session also disappeared. No successful download claimed.",
+  "local_tests_passed": 65,
+  "artifact_hash_checks_passed": true,
+  "local_model_case_batch_controls_passed": true,
+  "local_visual_review_passed": true
+}
