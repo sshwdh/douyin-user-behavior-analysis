@@ -11,6 +11,7 @@ from douyin_analysis.dashboard_data import (
     read_report,
 )
 from douyin_analysis.dashboard_errors import show_budget_comparison, show_error_groups
+from douyin_analysis.dashboard_evaluation import show_evaluation
 from douyin_analysis.dashboard_model_charts import (
     show_coefficients,
     show_confusion,
@@ -150,6 +151,8 @@ def model_page() -> None:
             show_weight_experiment()
         with st.container(border=True):
             show_coefficients()
+    with st.expander("补充评估 · 学习曲线、错误案例与交付"):
+        show_evaluation()
     with st.expander("用户与商品分层 · 三模型表现"):
         show_segment_performance()
     st.caption(
@@ -162,7 +165,7 @@ def main() -> None:
     st.set_page_config(page_title="抖音商城用户行为分析", layout="wide")
     style_page()
     st.sidebar.title("抖音商城分析")
-    st.sidebar.caption("第五版 · 2026-11-23\n基于已保存的分析结果")
+    st.sidebar.caption("评估补充版 · 2026-11-28\n基于已保存的分析结果")
     st.sidebar.info("行为码释义、时区与采样完整性待确认；当前仅作离线分析。")
     page = st.navigation(
         [

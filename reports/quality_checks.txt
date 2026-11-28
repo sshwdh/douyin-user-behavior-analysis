@@ -1,9 +1,9 @@
-UTC: 2026-11-27T20:03:50.154932+00:00
+UTC: 2026-11-28T11:20:36.201961+00:00
 3.12.2 (main, Feb  6 2024, 20:19:44) [Clang 15.0.0 (clang-1500.1.0.2.5)]
 COMMAND: python -m black --check src tests scripts
 
 All done! ✨ 🍰 ✨
-60 files would be left unchanged.
+62 files would be left unchanged.
 
 EXIT: 0
 COMMAND: python -m isort --check-only src tests scripts
@@ -15,7 +15,7 @@ COMMAND: python -m flake8 src tests scripts
 
 EXIT: 0
 COMMAND: python -m mypy src scripts
-Success: no issues found in 42 source files
+Success: no issues found in 43 source files
 
 
 EXIT: 0
@@ -33,7 +33,7 @@ PDF-specific coding rules passed.
 
 EXIT: 0
 COMMAND: python -m pytest -q
-..............................................................           [100%]
+.................................................................        [100%]
 =============================== warnings summary ===============================
 tests/test_candidate_preparation.py::test_tree_synthetic_smoke
   /Users/zhangyiming/Desktop/字节跳动--数据分析(实习)/.venv/lib/python3.12/site-packages/joblib/externals/loky/backend/context.py:134: UserWarning: Could not find the number of physical cores for the following reason:
@@ -42,7 +42,7 @@ tests/test_candidate_preparation.py::test_tree_synthetic_smoke
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-62 passed, 1 warning in 5.76s
+65 passed, 1 warning in 5.61s
 
 
 EXIT: 0
